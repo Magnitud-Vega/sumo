@@ -3,9 +3,9 @@ import { prisma } from "@/lib/db";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = params;
+  const { slug } = await context.params;
   const group = await prisma.groupOrder.findUnique({
     where: { slug },
     include: {

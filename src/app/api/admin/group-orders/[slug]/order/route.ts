@@ -4,10 +4,10 @@ import { createOrderLineSchema } from "@/lib/schema";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await context.params;
     const group = await prisma.groupOrder.findUnique({
       where: { slug },
       include: { menu: { include: { items: true } } },
