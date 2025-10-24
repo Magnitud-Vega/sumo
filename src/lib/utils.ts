@@ -1,6 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
 
-export const TZ = process.env.TZ || "America/Asuncion";
+export const TZ = process.env.APP_TZ || "America/Asuncion";
 
 export function isoToDate(isoOrString: string) {
   // Acepta "2025-10-22T18:30" o ISO completo
