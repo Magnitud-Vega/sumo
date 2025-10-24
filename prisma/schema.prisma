@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Menu {
+  id        String     @id @default(cuid())
+  title     String
+  createdAt DateTime   @default(now())
+  items     MenuItem[]
+  orders    GroupOrder[]
+}
+
+model MenuItem {
+  id        String   @id @default(cuid())
+  menu      Menu     @relation(fields: [menuId], references: [id])
+  menuId    String
+  name      String
+  priceGs   Int
+  category  String?
+  isActive  Boolean  @default(true)
+}
+
+model GroupOrder {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  menu           Menu         @relation(fields: [menuId], references: [id])
+  menuId         String
+  deadlineTs     DateTime
+  deliveryCostGs Int          @default(0)
+  minTotalGs     Int?         // mínimo en Gs (opcional)
+  minItems       Int?         // mínimo cantidad de ítems (opcional)
+  splitStrategy  SplitStrategy @default(EVEN)
+  status         Status       @default(OPEN)
+  adminPin       String
+  createdAt      DateTime     @default(now())
+  lines          OrderLine[]
+}
+
+model OrderLine {
+  id             String     @id @default(cuid())
+  groupOrder     GroupOrder @relation(fields: [groupOrderId], references: [id])
+  groupOrderId   String
+  name           String
+  whatsapp       String
+  payMethod      PayMethod
+  itemId         String
+  itemName       String
+  unitPriceGs    Int
+  qty            Int
+  note           String?
+  subtotalGs     Int
+  deliveryShareGs Int        @default(0)
+  totalGs        Int         @default(0)
+  status         LineStatus  @default(PENDING)
+  createdAt      DateTime    @default(now())
+}
+
+enum SplitStrategy {
+  EVEN
+  WEIGHTED
+}
+
+enum Status {
+  OPEN
+  CLOSED
+  DELIVERED
+  CANCELLED
+}
+
+enum LineStatus {
+  PENDING
+  FINALIZED
+  PAID
+}
+
+enum PayMethod {
+  TC
+  TD
+  TRANSFER
+  CASH
+  QR
+}
