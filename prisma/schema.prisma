@@ -45,6 +45,8 @@ model GroupOrder {
   status         Status       @default(OPEN)
   adminPin       String
   createdAt      DateTime     @default(now())
+  closedAt       DateTime?
+  cancelReason  String?
   lines          OrderLine[]
 }
 
