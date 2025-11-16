@@ -1,13 +1,14 @@
 // app/order/[slug]/page.tsx
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import type { GroupOrder, Menu, OrderLine } from "@prisma/client";
+import type { GroupOrder, Menu, OrderLine, MenuItem } from "@prisma/client";
 import BankInfoCard from "./BankInfoCard";
+import ItemForm from "./OrderItemForm";
 
 type Status = GroupOrder["status"];
 
 type GroupOrderWithRelations = GroupOrder & {
-  menu: Menu;
+  menu: Menu & { items: MenuItem[] };
   lines: OrderLine[];
 };
 
@@ -77,7 +78,11 @@ export default async function OrderPage({ params }: OrderPageProps) {
   const order = await prisma.groupOrder.findUnique({
     where: { slug },
     include: {
-      menu: true,
+      menu: {
+        include: {
+          items: true,
+        },
+      },
       lines: { orderBy: { createdAt: "asc" } },
     },
   });
@@ -95,12 +100,12 @@ export default async function OrderPage({ params }: OrderPageProps) {
       <section className="card-sumo space-y-3">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <h1 className="card-sumo-title font-brand text-sumo-2xl">
-              Pedido de grupo: {order.slug.toUpperCase()}
-            </h1>
-            <p className="card-sumo-subtitle mt-1">
-              Menú: <span className="font-medium">{order.menu.title}</span>
+            <p className="text-sumo-xs text-sumo-muted">
+              Pedido de grupo · {order.slug.toUpperCase()}
             </p>
+            <h1 className="card-sumo-title font-brand text-sumo-2xl">
+              {order.menu.title}
+            </h1>
           </div>
           <div className="flex flex-col items-start md:items-end gap-1">
             <span className="text-sumo-xs text-sumo-muted">
@@ -114,12 +119,17 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
         {order.status === "OPEN" && (
           <p className="text-sumo-sm text-sumo-muted">
-            El pedido todavía está <strong>abierto</strong>. Una vez que la
-            empresa cierre el pedido, vas a ver aquí las instrucciones para
-            confirmar tu pago.
+            El pedido todavía está <strong>abierto</strong>. Podés sumar tu
+            pedido y elegir cómo vas a pagar. Una vez que se cierre, vas a ver
+            aquí las instrucciones para confirmar tu pago.
           </p>
         )}
       </section>
+
+      {/* FORM PARA SUMAR ITEMS (solo cuando está abierto) */}
+      {order.status === "OPEN" && order.menu.items.length > 0 && (
+        <ItemForm groupSlug={order.slug} items={order.menu.items} />
+      )}
 
       {/* DATOS BANCARIOS (solo cerrada/entregada) */}
       {isClosedOrDelivered && (
@@ -135,7 +145,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
       {/* DETALLE DE ITEMS */}
       <section className="card-sumo space-y-3">
         <h2 className="card-sumo-title font-brand text-sumo-xl">
-          Detalle de tu pedido
+          Detalle de pedidos
         </h2>
 
         <div className="overflow-x-auto">
@@ -160,7 +170,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                     colSpan={isClosedOrDelivered ? 7 : 6}
                     className="py-6 text-center text-sumo-muted italic"
                   >
-                    No hay items cargados en este pedido.
+                    No hay ítems cargados en este pedido todavía.
                   </td>
                 </tr>
               )}
@@ -192,15 +202,13 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
                     {isClosedOrDelivered && (
                       <td className="text-center">
-                        {/* CASH PENDING */}
                         {isPending && line.payMethod === "CASH" && (
                           <p className="text-sumo-xs text-sumo-muted">
-                            Tu pago es en efectivo. El administrador confirmará
-                            cuando lo reciba.
+                            Pago en efectivo. El administrador confirmará cuando
+                            lo reciba.
                           </p>
                         )}
 
-                        {/* TRANSFER PENDING */}
                         {isPending && line.payMethod === "TRANSFER" && (
                           <div className="flex flex-col items-center gap-1">
                             <a
@@ -214,14 +222,13 @@ export default async function OrderPage({ params }: OrderPageProps) {
                             >
                               Confirmar pago por WhatsApp
                             </a>
-                            <p className="text-[10px] text-sumo-muted max-w-[180px]">
+                            <p className="text-[10px] text-sumo-muted max-w-[200px]">
                               Después de transferir, tocá el botón para avisar y
                               adjuntar el comprobante desde WhatsApp.
                             </p>
                           </div>
                         )}
 
-                        {/* OTROS CASOS */}
                         {(!isPending ||
                           line.payMethod === "TC" ||
                           line.payMethod === "TD" ||
