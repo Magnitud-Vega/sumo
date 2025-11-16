@@ -48,6 +48,13 @@ model GroupOrder {
   closedAt       DateTime?
   cancelReason  String?
   lines          OrderLine[]
+   // 🔽 Nuevos campos multi-empresa / bancarios 🔽
+  companyName     String
+  companyWhatsapp String      // número en formato internacional, solo dígitos, ej: 595971234567
+  bankName        String
+  bankHolder      String      // Titular
+  bankAccount     String      // Número de cuenta o alias
+  bankDoc         String      // RUC o CI
 }
 
 model OrderLine {

@@ -9,6 +9,15 @@ export const createGroupOrderSchema = z.object({
   minItems: z.coerce.number().int().nonnegative().optional(),
   splitStrategy: z.enum(["EVEN", "WEIGHTED"]).default("EVEN"),
   adminPin: z.string().min(3),
+  companyName: z.string().min(1),
+  companyWhatsapp: z
+    .string()
+    .min(6)
+    .regex(/^\d+$/, "Solo dígitos, formato internacional sin + ni 00"),
+  bankName: z.string().min(1),
+  bankHolder: z.string().min(1),
+  bankAccount: z.string().min(1),
+  bankDoc: z.string().min(1),
 });
 
 export const createOrderLineSchema = z.object({

@@ -16,6 +16,12 @@ export default function AdminPage() {
     minItems: 0,
     splitStrategy: "EVEN",
     adminPin: "",
+    companyName: "",
+    companyWhatsapp: "",
+    bankName: "",
+    bankHolder: "",
+    bankAccount: "",
+    bankDoc: "",
   });
 
   useEffect(() => {
@@ -124,6 +130,97 @@ export default function AdminPage() {
             onChange={(e) => setForm({ ...form, adminPin: e.target.value })}
           />
         </label>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium">
+              Nombre de la empresa
+            </label>
+            <input
+              type="text"
+              name="companyName"
+              required
+              placeholder="Empresa S.A."
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.companyName}
+              onChange={(e) =>
+                setForm({ ...form, companyName: e.target.value })
+              }
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Usá solo números, sin +, sin espacios. Ejemplo: 595971234567
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium">
+              WhatsApp de la empresa
+            </label>
+            <input
+              type="tel"
+              name="companyWhatsapp"
+              required
+              placeholder="5959XXXXXXX"
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.companyWhatsapp}
+              onChange={(e) =>
+                setForm({ ...form, companyWhatsapp: e.target.value })
+              }
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Usá solo números, sin +, sin espacios. Ejemplo: 595971234567
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Banco</label>
+            <input
+              type="text"
+              name="bankName"
+              required
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.bankName}
+              onChange={(e) => setForm({ ...form, bankName: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Titular</label>
+            <input
+              type="text"
+              name="bankHolder"
+              required
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.bankHolder}
+              onChange={(e) => setForm({ ...form, bankHolder: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Cuenta / Alias</label>
+            <input
+              type="text"
+              name="bankAccount"
+              required
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.bankAccount}
+              onChange={(e) =>
+                setForm({ ...form, bankAccount: e.target.value })
+              }
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">RUC o CI</label>
+            <input
+              type="text"
+              name="bankDoc"
+              required
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+              value={form.bankDoc}
+              onChange={(e) => setForm({ ...form, bankDoc: e.target.value })}
+            />
+          </div>
+        </div>
 
         <button
           className="bg-black text-white px-4 py-2 rounded"

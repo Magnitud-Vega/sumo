@@ -26,6 +26,12 @@ async function main() {
       minTotalGs: 300000,
       splitStrategy: "EVEN",
       adminPin: "1234",
+      companyName: "PizzBur Fran",
+      companyWhatsapp: "595987140503",
+      bankName: "Tu Financiera",
+      bankHolder: "Francisco Espinoza",
+      bankAccount: "0987140503",
+      bankDoc: "1234567-8",
     },
   });
 

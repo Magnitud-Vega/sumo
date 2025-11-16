@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type G = {
   id: string;
@@ -93,6 +94,12 @@ export default function AdminPage() {
                     ) : (
                       <span className="text-gray-500">—</span>
                     )}
+                    <Link
+                      href={`/admin/group-orders/${g.id}`}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      Ver detalle
+                    </Link>
                   </td>
                 </tr>
               ))}
