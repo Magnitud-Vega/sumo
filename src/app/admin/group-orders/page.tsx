@@ -1,3 +1,4 @@
+// app/admin/group-orders/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,11 +15,45 @@ type G = {
   total: number;
 };
 
-export default function AdminPage() {
-  // ... (tu UI de crear evento ya existente)
+function formatGs(value: number) {
+  return value.toLocaleString("es-PY");
+}
 
+function mapStatusLabel(status: G["status"]) {
+  switch (status) {
+    case "OPEN":
+      return "Abierta";
+    case "CLOSED":
+      return "Cerrada";
+    case "DELIVERED":
+      return "Entregada";
+    case "CANCELLED":
+      return "Cancelada";
+    default:
+      return status;
+  }
+}
+
+function statusClasses(status: G["status"]) {
+  // Pills de estado para admin
+  switch (status) {
+    case "OPEN":
+      return "bg-sumo-muted text-sumo-primary";
+    case "CLOSED":
+      return "bg-sumo-muted text-sumo-muted";
+    case "DELIVERED":
+      return "bg-emerald-50 text-emerald-700";
+    case "CANCELLED":
+      return "bg-red-50 text-red-700";
+    default:
+      return "bg-sumo-muted text-sumo-muted";
+  }
+}
+
+export default function AdminPage() {
   const [groups, setGroups] = useState<G[]>([]);
   const [loading, setLoading] = useState(false);
+  const [closingId, setClosingId] = useState<string | null>(null);
 
   async function load() {
     const res = await fetch("/api/admincito/group-orders/list");
@@ -31,12 +66,15 @@ export default function AdminPage() {
 
   async function closeNow(id: string) {
     setLoading(true);
+    setClosingId(id);
     const res = await fetch(`/api/admincito/group-orders/${id}/close`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ adminPin: "1234" }), // si lo validas
+      body: JSON.stringify({ adminPin: "1234" }),
     });
     setLoading(false);
+    setClosingId(null);
+
     if (!res.ok) {
       const e = await res.json();
       alert(e.error || "Error al cerrar");
@@ -47,66 +85,118 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
-      {/* ... BLOQUE CREAR EVENTO ... */}
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      {/* HEADER / INTRO */}
+      <header className="card-sumo">
+        <div className="card-sumo-header">
+          <div>
+            <h1 className="card-sumo-title font-brand">
+              SUMO · Eventos de grupo
+            </h1>
+            <p className="card-sumo-subtitle">
+              Gestioná tus pedidos grupales, cerrá eventos y revisá los detalles
+              de cada orden.
+            </p>
+          </div>
 
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Eventos</h2>
+          {/* Aquí podrías agregar un botón para crear evento, si lo tenés */}
+          {/* <button className="btn-sumo text-xs md:text-sm">
+            + Nuevo evento
+          </button> */}
+        </div>
+
+        {/* Si tenés tu UI de crear evento, la podés envolver en un div así: */}
+        {/* <div className="mt-4">
+          ... UI CREAR EVENTO ...
+        </div> */}
+      </header>
+
+      {/* LISTA DE EVENTOS */}
+      <section className="card-sumo space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="card-sumo-title font-brand text-sumo-xl">
+            Eventos activos y cerrados
+          </h2>
+          <p className="card-sumo-subtitle">
+            Total: {groups.length} evento{groups.length === 1 ? "" : "s"}
+          </p>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
+          <table className="table-sumo">
+            <thead>
               <tr>
-                <th className="p-2 text-left">Slug</th>
-                <th className="p-2 text-left">Menú</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Deadline</th>
-                <th className="p-2">Ítems</th>
-                <th className="p-2">Subtotal</th>
-                <th className="p-2">Total</th>
-                <th className="p-2">Acciones</th>
+                <th>Slug</th>
+                <th>Menú</th>
+                <th className="text-center">Estado</th>
+                <th>Deadline</th>
+                <th className="text-center">Ítems</th>
+                <th className="text-right">Subtotal</th>
+                <th className="text-right">Total</th>
+                <th className="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {groups.map((g) => (
-                <tr key={g.id} className="border-t">
-                  <td className="p-2">{g.slug}</td>
-                  <td className="p-2">{g.menu}</td>
-                  <td className="p-2 text-center">{g.status}</td>
-                  <td className="p-2">
+                <tr key={g.id}>
+                  <td className="font-medium">{g.slug}</td>
+                  <td>{g.menu}</td>
+                  <td className="text-center">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusClasses(
+                        g.status
+                      )}`}
+                    >
+                      {mapStatusLabel(g.status)}
+                    </span>
+                  </td>
+                  <td className="text-sumo-sm text-sumo-muted">
                     {new Date(g.deadlineTs).toLocaleString("es-PY")}
                   </td>
-                  <td className="p-2 text-center">{g.items}</td>
-                  <td className="p-2 text-right">
-                    {g.subtotal.toLocaleString()} Gs
+                  <td className="text-center">{g.items}</td>
+                  <td className="text-right">
+                    {formatGs(g.subtotal)}{" "}
+                    <span className="text-sumo-muted">Gs</span>
                   </td>
-                  <td className="p-2 text-right">
-                    {g.total.toLocaleString()} Gs
+                  <td className="text-right">
+                    {formatGs(g.total)}{" "}
+                    <span className="text-sumo-muted">Gs</span>
                   </td>
-                  <td className="p-2">
-                    {g.status === "OPEN" ? (
-                      <button
-                        disabled={loading}
-                        className="px-3 py-1 rounded bg-black text-white"
-                        onClick={() => closeNow(g.id)}
+                  <td>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      {g.status === "OPEN" && (
+                        <button
+                          disabled={loading && closingId === g.id}
+                          className="btn-sumo text-xs px-3 py-1"
+                          onClick={() => closeNow(g.id)}
+                        >
+                          {loading && closingId === g.id
+                            ? "Cerrando..."
+                            : "Cerrar ahora"}
+                        </button>
+                      )}
+                      {g.status !== "OPEN" && (
+                        <span className="text-sumo-xs text-sumo-muted">
+                          Cierre realizado
+                        </span>
+                      )}
+
+                      <Link
+                        href={`/admin/group-orders/${g.id}`}
+                        className="btn-sumo-ghost text-xs px-3 py-1"
                       >
-                        {loading ? "Cerrando..." : "Cerrar ahora"}
-                      </button>
-                    ) : (
-                      <span className="text-gray-500">—</span>
-                    )}
-                    <Link
-                      href={`/admin/group-orders/${g.id}`}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Ver detalle
-                    </Link>
+                        Ver detalle
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
+
               {groups.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="p-4 text-center text-gray-500">
-                    Sin eventos
+                  <td colSpan={8} className="py-6 text-center text-sumo-muted">
+                    Sin eventos por el momento. Creá tu primer pedido grupal
+                    para comenzar 🙌
                   </td>
                 </tr>
               )}

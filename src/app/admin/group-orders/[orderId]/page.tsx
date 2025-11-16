@@ -1,4 +1,4 @@
-// app/admin/group-order/[orderId]/page.tsx
+// app/admin/group-orders/[orderId]/page.tsx
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import OrderLinesTable from "./OrderLinesTable";
@@ -13,7 +13,7 @@ export default async function GroupOrderDetailPage({
   params,
 }: GroupOrderDetailPageProps) {
   const { orderId } = await params;
-  console.log("Params:", orderId);
+
   try {
     if (!orderId) {
       notFound();
@@ -34,18 +34,27 @@ export default async function GroupOrderDetailPage({
     }
 
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        <section className="card-sumo space-y-2">
+          <h1 className="card-sumo-title font-brand text-sumo-2xl">
             Orden de grupo: {groupOrder.slug}
           </h1>
-          <p className="text-sm text-gray-500">
-            Menú: {groupOrder.menu.title} · Deadline:{" "}
-            {groupOrder.deadlineTs.toLocaleString()}
+          <p className="card-sumo-subtitle">
+            Menú: <span className="font-medium">{groupOrder.menu.title}</span>
           </p>
-        </div>
+          <p className="card-sumo-subtitle">
+            Deadline:{" "}
+            {groupOrder.deadlineTs.toLocaleString("es-PY", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
+          </p>
+        </section>
 
-        <OrderLinesTable initialLines={groupOrder.lines} />
+        <section className="card-sumo">
+          {/* OrderLinesTable ya maneja la tabla interna */}
+          <OrderLinesTable initialLines={groupOrder.lines} />
+        </section>
       </div>
     );
   } catch (error) {

@@ -48,19 +48,19 @@ export default function OrderLinesTable({
   };
 
   return (
-    <div className="mt-4">
-      <table className="min-w-full text-sm border border-gray-200 rounded-md overflow-hidden">
-        <thead className="bg-gray-50">
+    <div className="mt-4 overflow-x-auto">
+      <table className="table-sumo">
+        <thead>
           <tr>
-            <th className="px-3 py-2 text-left">Nombre</th>
-            <th className="px-3 py-2 text-left">WhatsApp</th>
-            <th className="px-3 py-2 text-left">Pago</th>
-            <th className="px-3 py-2 text-left">Item</th>
-            <th className="px-3 py-2 text-right">Subtotal (Gs)</th>
-            <th className="px-3 py-2 text-right">Delivery (Gs)</th>
-            <th className="px-3 py-2 text-right">Total (Gs)</th>
-            <th className="px-3 py-2 text-center">Estado</th>
-            <th className="px-3 py-2 text-center">Acciones</th>
+            <th>Nombre</th>
+            <th>WhatsApp</th>
+            <th>Pago</th>
+            <th>Item</th>
+            <th className="text-right">Subtotal (Gs)</th>
+            <th className="text-right">Delivery (Gs)</th>
+            <th className="text-right">Total (Gs)</th>
+            <th className="text-center">Estado</th>
+            <th className="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -68,47 +68,79 @@ export default function OrderLinesTable({
             <tr>
               <td
                 colSpan={9}
-                className="px-3 py-6 text-center text-gray-500 italic"
+                className="py-6 text-center text-sumo-muted italic"
               >
                 No hay ítems cargados para esta orden.
               </td>
             </tr>
           )}
 
-          {lines.map((line) => (
-            <tr key={line.id} className="border-t border-gray-200">
-              <td className="px-3 py-2">{line.name}</td>
-              <td className="px-3 py-2">{line.whatsapp}</td>
-              <td className="px-3 py-2">{line.payMethod}</td>
-              <td className="px-3 py-2">{line.itemName}</td>
-              <td className="px-3 py-2 text-right">
-                {line.subtotalGs.toLocaleString("es-PY")}
-              </td>
-              <td className="px-3 py-2 text-right">
-                {line.deliveryShareGs.toLocaleString("es-PY")}
-              </td>
-              <td className="px-3 py-2 text-right">
-                {line.totalGs.toLocaleString("es-PY")}
-              </td>
-              <td className="px-3 py-2 text-center">{line.status}</td>
-              <td className="px-3 py-2 text-center">
-                {line.status === "PENDING" && (
-                  <button
-                    type="button"
-                    onClick={() => handleMarkAsPaid(line.id)}
-                    disabled={isPending && updatingId === line.id}
-                    className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md border border-emerald-600 text-emerald-700 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isPending && updatingId === line.id
-                      ? "Actualizando..."
-                      : "Cambiar a PAGADO"}
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
+          {lines.map((line) => {
+            const statusLabel =
+              line.status === "PAID"
+                ? "Pagado"
+                : line.status === "FINALIZED"
+                ? "Finalizado"
+                : "Pendiente";
+
+            const statusPillClass =
+              line.status === "PAID"
+                ? "table-sumo-status-paid"
+                : "table-sumo-status-pending";
+
+            return (
+              <tr key={line.id}>
+                <td className="font-medium">{line.name}</td>
+                <td className="text-sumo-sm text-sumo-muted">
+                  {line.whatsapp}
+                </td>
+                <td className="text-sumo-sm">
+                  {line.payMethod === "CASH"
+                    ? "Efectivo"
+                    : line.payMethod === "TRANSFER"
+                    ? "Transferencia"
+                    : line.payMethod === "TC"
+                    ? "Tarjeta crédito"
+                    : line.payMethod === "TD"
+                    ? "Tarjeta débito"
+                    : line.payMethod === "QR"
+                    ? "QR"
+                    : line.payMethod}
+                </td>
+                <td>{line.itemName}</td>
+                <td className="text-right">
+                  {line.subtotalGs.toLocaleString("es-PY")}
+                </td>
+                <td className="text-right">
+                  {line.deliveryShareGs.toLocaleString("es-PY")}
+                </td>
+                <td className="text-right">
+                  {line.totalGs.toLocaleString("es-PY")}
+                </td>
+                <td className="text-center">
+                  <span className={`table-sumo-status-pill ${statusPillClass}`}>
+                    {statusLabel}
+                  </span>
+                </td>
+                <td className="text-center">
+                  {line.status === "PENDING" && (
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAsPaid(line.id)}
+                      disabled={isPending && updatingId === line.id}
+                      className="btn-sumo text-[11px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isPending && updatingId === line.id
+                        ? "Actualizando..."
+                        : "Cambiar a PAGADO"}
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-    </div>
+    </div>  
   );
 }
