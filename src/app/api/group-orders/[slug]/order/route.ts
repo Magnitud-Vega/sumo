@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createOrderLineSchema } from "@/lib/schema";
+import { sendWhatsAppText, toGs } from "@/lib/whatsapp";
 
 export async function POST(
   req: NextRequest,
@@ -61,6 +62,42 @@ export async function POST(
         subtotalGs: subtotal,
       },
     });
+
+    try {
+      // send template confirmation
+      // await sendWhatsAppTemplate({
+      //   to: line.whatsapp.startsWith("+")
+      //     ? line.whatsapp
+      //     : `+${line.whatsapp.replace(/^0+/, "595")}`,
+      //   name: "pedido_confirmado",
+      //   bodyParams: [
+      //     { type: "text", text: line.name },
+      //     { type: "text", text: group.slug },
+      //     {
+      //       type: "text",
+      //       text: new Date(group.deadlineTs).toLocaleTimeString("es-PY", {
+      //         hour: "2-digit",
+      //         minute: "2-digit",
+      //       }),
+      //     },
+      //     { type: "text", text: `${toGs(line.subtotalGs)}` },
+      //   ],
+      // });
+
+      // send plain text confirmation
+      await sendWhatsAppText({
+        to: line.whatsapp.startsWith("+")
+          ? line.whatsapp.replace("+", "")
+          : `${line.whatsapp.replace(/^0+/, "595")}`,
+        text: `Hola ${line.name}, tu pedido en el grupo "${
+          group.slug
+        }" ha sido registrado. Total: ${toGs(
+          line.subtotalGs
+        )}. Gracias por usar SUMO Pedidos.`,
+      });
+    } catch (e) {
+      console.error("[WA pedido_confirmado] ", e);
+    }
 
     return NextResponse.json(line);
   } catch (e: any) {

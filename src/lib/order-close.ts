@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { splitDelivery } from "@/lib/calc";
+import { sendWhatsAppTemplate, sendWhatsAppText, toGs } from "@/lib/whatsapp";
 
 export async function closeGroupOrderById(groupOrderId: string) {
   // 1) Trae el evento + líneas
@@ -79,6 +80,43 @@ export async function closeGroupOrderById(groupOrderId: string) {
       data: { status: "CLOSED", closedAt: new Date(), cancelReason: null },
     });
   });
+
+  // reenviá info actualizada para cada línea
+  const lines = await prisma.orderLine.findMany({
+    where: { groupOrderId: group.id },
+  });
+  for (const l of lines) {
+    try {
+      // await sendWhatsAppTemplate({
+      //   to: l.whatsapp.startsWith("+")
+      //     ? l.whatsapp
+      //     : `+${l.whatsapp.replace(/^0+/, "595")}`,
+      //   name: "pedido_cerrado",
+      //   bodyParams: [
+      //     { type: "text", text: l.name },
+      //     { type: "text", text: toGs(l.totalGs) },
+      //     { type: "text", text: toGs(l.deliveryShareGs) },
+      //     { type: "text", text: l.payMethod }, // "CASH" | "QR" | "TRANSFER" | "TC" | "TD"
+      //   ],
+      // });
+      // await sendWhatsAppText({
+      //   to: l.whatsapp.startsWith("+")
+      //     ? l.whatsapp.replace("+", "")
+      //     : `${l.whatsapp.replace(/^0+/, "595")}`,
+      //   text: `Hola ${l.name}, el grupo de pedidos "${
+      //     group.slug
+      //   }" ha sido cerrado. El total de tu pedido es ${toGs(
+      //     l.totalGs
+      //   )}, que incluye ${toGs(
+      //     l.deliveryShareGs
+      //   )} de costo de delivery. Tu método de pago seleccionado es ${
+      //     l.payMethod
+      //   }. ¡Gracias por tu pedido!`,
+      // });
+    } catch (e) {
+      console.error("[WA pedido_cerrado] ", e);
+    }
+  }
 
   return {
     ok: true,

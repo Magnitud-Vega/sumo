@@ -129,7 +129,7 @@ export default function AdminPage() {
           className="bg-black text-white px-4 py-2 rounded"
           onClick={async () => {
             if (!menuId) return alert("Selecciona un menú");
-            const res = await fetch("/api/admin/group-orders", {
+            const res = await fetch("/api/admincito/group-orders", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ ...form, menuId }),

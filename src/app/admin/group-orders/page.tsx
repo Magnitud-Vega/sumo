@@ -20,7 +20,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
 
   async function load() {
-    const res = await fetch("/api/admin/group-orders/list");
+    const res = await fetch("/api/admincito/group-orders/list");
     if (res.ok) setGroups(await res.json());
   }
 
@@ -30,7 +30,7 @@ export default function AdminPage() {
 
   async function closeNow(id: string) {
     setLoading(true);
-    const res = await fetch(`/api/admin/group-orders/${id}/close`, {
+    const res = await fetch(`/api/admincito/group-orders/${id}/close`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ adminPin: "1234" }), // si lo validas
