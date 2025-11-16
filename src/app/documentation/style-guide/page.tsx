@@ -1,4 +1,5 @@
 // app/admin/style-guide/page.tsx
+import { Typography } from "@/components/ui/Typography";
 import type { ReactNode } from "react";
 
 const colors = [
@@ -88,9 +89,25 @@ export default function StyleGuidePage() {
           <h4>Heading 4</h4>
           <h5>Heading 5</h5>
           <h6>Heading 6</h6>
-          <p className="text-sumo-base">Texto base</p>
-          <p className="text-sumo-sm">Texto pequeño</p>
-          <p className="text-sumo-xs">Texto extra pequeño</p>
+          <p className="text-sumo-base">
+            Texto base Texto base Texto base Texto base Texto base Texto base
+          </p>
+          <p className="text-sumo-sm">
+            Texto pequeño Texto pequeño Texto pequeño Texto pequeño Texto
+            pequeño
+          </p>
+          <p className="text-sumo-xs">
+            Texto extra pequeño Texto extra pequeño Texto extra pequeño Texto
+            extra pequeño
+          </p>
+          <hr className="my-6" />
+          <Typography variant="h1">
+            SUMO – Pedidos Grupales (variant h1)
+          </Typography>
+
+          <Typography variant="subtitle">
+            Elegí tu plato y confirmá tu pago (variant subtitle)
+          </Typography>
         </div>
       </section>
     </div>
