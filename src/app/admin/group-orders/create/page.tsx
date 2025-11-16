@@ -58,6 +58,8 @@ export default function AdminPage() {
         <label className="block">
           <span>Slug público</span>
           <input
+            id="slug"
+            name="slug"
             className="border p-2 w-full"
             value={form.slug}
             onChange={(e) => setForm({ ...form, slug: e.target.value })}
@@ -67,6 +69,8 @@ export default function AdminPage() {
         <label className="block">
           <span>Deadline (YYYY-MM-DDTHH:mm)</span>
           <input
+            id="deadlineTs"
+            name="deadlineTs"
             className="border p-2 w-full"
             placeholder="2025-10-22T13:30"
             value={form.deadlineTs}
@@ -78,6 +82,8 @@ export default function AdminPage() {
           <label className="block">
             <span>Delivery (Gs)</span>
             <input
+              id="deliveryCostGs"
+              name="deliveryCostGs"
               className="border p-2 w-full"
               type="number"
               value={form.deliveryCostGs}
@@ -89,6 +95,8 @@ export default function AdminPage() {
           <label className="block">
             <span>Mínimo total (Gs)</span>
             <input
+              id="minTotalGs"
+              name="minTotalGs"
               className="border p-2 w-full"
               type="number"
               value={form.minTotalGs}
@@ -100,6 +108,8 @@ export default function AdminPage() {
           <label className="block">
             <span>Mínimo ítems</span>
             <input
+              id="minItems"
+              name="minItems"
               className="border p-2 w-full"
               type="number"
               value={form.minItems}
@@ -111,6 +121,8 @@ export default function AdminPage() {
         <label className="block">
           <span>Estrategia</span>
           <select
+            id="splitStrategy"
+            name="splitStrategy"
             className="border p-2 w-full"
             value={form.splitStrategy}
             onChange={(e) =>
@@ -125,6 +137,8 @@ export default function AdminPage() {
         <label className="block">
           <span>Admin PIN</span>
           <input
+            id="adminPin"
+            name="adminPin"
             className="border p-2 w-full"
             value={form.adminPin}
             onChange={(e) => setForm({ ...form, adminPin: e.target.value })}
@@ -137,8 +151,9 @@ export default function AdminPage() {
               Nombre de la empresa
             </label>
             <input
-              type="text"
+              id="companyName"
               name="companyName"
+              type="text"
               required
               placeholder="Empresa S.A."
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
@@ -156,8 +171,9 @@ export default function AdminPage() {
               WhatsApp de la empresa
             </label>
             <input
-              type="tel"
+              id="companyWhatsapp"
               name="companyWhatsapp"
+              type="tel"
               required
               placeholder="5959XXXXXXX"
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
@@ -174,8 +190,9 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium">Banco</label>
             <input
-              type="text"
+              id="bankName"
               name="bankName"
+              type="text"
               required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={form.bankName}
@@ -186,8 +203,9 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium">Titular</label>
             <input
-              type="text"
+              id="bankHolder"
               name="bankHolder"
+              type="text"
               required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={form.bankHolder}
@@ -198,8 +216,9 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium">Cuenta / Alias</label>
             <input
-              type="text"
+              id="bankAccount"
               name="bankAccount"
+              type="text"
               required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={form.bankAccount}
@@ -212,8 +231,9 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium">RUC o CI</label>
             <input
-              type="text"
+              id="bankDoc"
               name="bankDoc"
+              type="text"
               required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={form.bankDoc}

@@ -1,26 +1,360 @@
+/* Tailwind 4: un solo import */
 @import "tailwindcss";
 
+/* ============================
+   COLORES LIGHT/DARK - SUMO
+   ============================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* PALETA 1 – Vibrante y alegre (Light) */
+  --sumo-primary: #2563eb; /* Azul vibrante */
+  --sumo-primary-hover: #1e40af; /* Azul profundo */
+  --sumo-secondary: #a3e635; /* Verde lima suave */
+  --sumo-accent: #facc15; /* Amarillo cálido */
+
+  --sumo-bg: #f8fafc; /* Background general */
+  --sumo-surface: #ffffff; /* Cards, modals, etc. */
+  --sumo-border: #e2e8f0; /* Bordes suaves */
+
+  --sumo-text-primary: #0f172a; /* Texto principal */
+  --sumo-text-secondary: #475569; /* Texto secundario */
+  --sumo-text-muted: #94a3b8; /* Etiquetas, helpers */
+
+  --sumo-danger: #ef4444; /* (opcional) errores */
+  --sumo-success: #16a34a; /* (opcional) estados OK */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Versión Dark de la misma paleta */
+:root.dark,
+.dark :root {
+  --sumo-primary: #60a5fa; /* Azul eléctrico */
+  --sumo-primary-hover: #93c5fd;
+  --sumo-secondary: #bef264; /* Verde lima neon */
+  --sumo-accent: #fde047; /* Amarillo claro */
+
+  --sumo-bg: #0a1124; /* Background oscuro */
+  --sumo-surface: #1e293b; /* Cards en dark */
+  --sumo-border: #334155; /* Bordes más marcados */
+
+  --sumo-text-primary: #f8fafc;
+  --sumo-text-secondary: #cbd5e1;
+  --sumo-text-muted: #64748b;
+
+  --sumo-danger: #fca5a5;
+  --sumo-success: #4ade80;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================
+   TIPOGRAFÍA – SUMO
+   ============================ */
+
+:root {
+  --font-primary: var(--font-inter);
+  --font-brand: var(--font-fredoka);
+
+  /* Escala tipográfica recomendada */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+}
+
+/* Fondo base y tipografía global */
+body {
+  background-color: var(--sumo-bg);
+  color: var(--sumo-text-primary);
+  font-family: var(--font-primary), sans-serif;
+}
+
+/* ============================
+   UTILITIES SUMO
+   ============================ */
+
+/* <div className="bg-sumo-surface border border-sumo-soft text-sumo-primary" /> */
+@layer utilities {
+  /* Colores básicos SUMO */
+  .bg-sumo-primary {
+    background-color: var(--sumo-primary);
+  }
+  .bg-sumo-secondary {
+    background-color: var(--sumo-secondary);
+  }
+  .bg-sumo-accent {
+    background-color: var(--sumo-accent);
+  }
+  .bg-sumo-surface {
+    background-color: var(--sumo-surface);
+  }
+  .bg-sumo-muted {
+    background-color: rgba(148, 163, 184, 0.1); /* suave */
+  }
+
+  .text-sumo-primary {
+    color: var(--sumo-primary);
+  }
+  .text-sumo-secondary {
+    color: var(--sumo-secondary);
+  }
+  .text-sumo-accent {
+    color: var(--sumo-accent);
+  }
+  .text-sumo-muted {
+    color: var(--sumo-text-muted);
+  }
+
+  .border-sumo-primary {
+    border-color: var(--sumo-primary);
+  }
+  .border-sumo-soft {
+    border-color: var(--sumo-border);
+  }
+
+  /* Familias tipográficas SUMO */
+  .font-primary {
+    font-family: var(--font-primary), sans-serif;
+  }
+
+  .font-brand {
+    font-family: var(--font-brand), sans-serif;
+  }
+
+  /* Tamaños tipográficos SUMO */
+  .text-sumo-xs {
+    font-size: var(--text-xs);
+  }
+  .text-sumo-sm {
+    font-size: var(--text-sm);
+  }
+  .text-sumo-base {
+    font-size: var(--text-base);
+  }
+  .text-sumo-lg {
+    font-size: var(--text-lg);
+  }
+  .text-sumo-xl {
+    font-size: var(--text-xl);
+  }
+  .text-sumo-2xl {
+    font-size: var(--text-2xl);
+  }
+  .text-sumo-3xl {
+    font-size: var(--text-3xl);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================
+   COMPONENTES SUMO
+   ============================ */
+
+/* BUTTONS
+<button className="btn-sumo">Confirmar pedido</button>
+<button className="btn-sumo-secondary">Ver menú</button>
+<button className="btn-sumo-ghost">Cancelar</button>
+ */
+@layer components {
+  .btn-sumo {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    background-color: var(--sumo-primary);
+    color: #ffffff;
+    border: 1px solid transparent;
+  }
+
+  .btn-sumo:hover {
+    background-color: var(--sumo-primary-hover);
+  }
+
+  .btn-sumo-secondary {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    background-color: var(--sumo-secondary);
+    color: #0f172a;
+    border: 1px solid transparent;
+  }
+
+  .btn-sumo-secondary:hover {
+    filter: brightness(0.95);
+  }
+
+  .btn-sumo-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    background-color: transparent;
+    color: var(--sumo-primary);
+    border: 1px solid transparent;
+  }
+
+  .btn-sumo-ghost:hover {
+    background-color: rgba(37, 99, 235, 0.08);
+  }
+
+  .btn-sumo-danger {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors;
+    background-color: var(--sumo-danger);
+    color: #fef2f2;
+  }
+
+  .btn-sumo-danger:hover {
+    filter: brightness(0.93);
+  }
+}
+
+/* CARDS
+<div className="card-sumo">
+  <div className="card-sumo-header">
+    <div>
+      <h2 className="card-sumo-title">Orden de grupo: martes-chill-cena</h2>
+      <p className="card-sumo-subtitle">Estado: Abierta · 12 personas</p>
+    </div>
+    <span className="card-sumo-badge">+ Nueva ronda</span>
+  </div>
+
+  { contenido }
+</div>
+ */
+@layer components {
+  .card-sumo {
+    @apply rounded-2xl border shadow-sm p-4 md:p-6;
+    background-color: var(--sumo-surface);
+    border-color: var(--sumo-border);
+  }
+
+  .card-sumo-header {
+    @apply mb-6 flex items-center justify-between gap-2 border-b;
+    border-color: var(--sumo-border);
+  }
+
+  .card-sumo-title {
+    @apply text-base md:text-lg font-semibold;
+  }
+
+  .card-sumo-subtitle {
+    @apply text-xs md:text-sm;
+    color: var(--sumo-text-muted);
+  }
+
+  .card-sumo-badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+    background-color: rgba(37, 99, 235, 0.08);
+    color: var(--sumo-primary);
+  }
+}
+
+/* TABLE
+<table className="table-sumo">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Ítem</th>
+      <th className="text-right">Subtotal</th>
+      <th className="text-right">Delivery</th>
+      <th className="text-right">Total</th>
+      <th className="text-center">Pago</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    { map de lines }
+    <tr>
+      <td>Julia</td>
+      <td>Pizza muzzarella</td>
+      <td className="text-right">30.000</td>
+      <td className="text-right">5.000</td>
+      <td className="text-right">35.000</td>
+      <td className="text-center">
+        <span className="table-sumo-status-pill table-sumo-status-pending">
+          Pendiente
+        </span>
+      </td>
+      <td className="text-center">
+        <button className="btn-sumo text-xs px-3 py-1">
+          Confirmar pago
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table> 
+*/
+@layer components {
+  .table-sumo {
+    @apply w-full text-sm border-separate border-spacing-0;
+  }
+
+  .table-sumo thead tr {
+    background-color: rgba(15, 23, 42, 0.03);
+  }
+
+  .table-sumo th,
+  .table-sumo td {
+    @apply px-3 py-2 align-middle;
+  }
+
+  .table-sumo th {
+    @apply text-left text-xs font-semibold uppercase tracking-wide border-b;
+    color: var(--sumo-text-muted);
+    border-color: var(--sumo-border);
+  }
+
+  .table-sumo tbody tr {
+    @apply border-b;
+    border-color: var(--sumo-border);
+  }
+
+  .table-sumo tbody tr:nth-child(even) {
+    background-color: rgba(148, 163, 184, 0.04);
+  }
+
+  .table-sumo-status-pill {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .table-sumo-status-pending {
+    background-color: rgba(250, 204, 21, 0.1);
+    color: #854d0e;
+  }
+
+  .table-sumo-status-paid {
+    background-color: rgba(22, 163, 74, 0.12);
+    color: #166534;
+  }
+}
+
+/* ============================
+   TIPOGRAFÍA GLOBAL – SUMO
+   ============================ */
+@layer base {
+  h1 {
+    font-family: var(--font-brand), sans-serif;
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+  }
+
+  h2 {
+    font-family: var(--font-brand), sans-serif;
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    margin-bottom: 0.4em;
+  }
+
+  h3 {
+    font-family: var(--font-brand), sans-serif;
+    font-size: var(--text-xl);
+    font-weight: 600;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-brand), sans-serif;
+    font-weight: 500;
+  }
+
+  p {
+    font-family: var(--font-primary), sans-serif;
+    font-size: var(--text-base);
+    font-weight: 400;
+    line-height: 1.55;
+  }
 }

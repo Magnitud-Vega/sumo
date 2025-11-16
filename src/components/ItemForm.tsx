@@ -38,6 +38,8 @@ export default function ItemForm({
         <label className="block">
           <span>Cantidad</span>
           <input
+            id="qty"
+            name="qty"
             type="number"
             min={1}
             className="border p-2 w-full"
@@ -48,6 +50,8 @@ export default function ItemForm({
         <label className="block">
           <span>Método de pago</span>
           <select
+            id="payMethod"
+            name="payMethod"
             className="border p-2 w-full"
             value={payMethod}
             onChange={(e) => setPayMethod(e.target.value)}
@@ -65,6 +69,8 @@ export default function ItemForm({
         <label className="block">
           <span>Tu nombre</span>
           <input
+            id="name"
+            name="name"
             className="border p-2 w-full"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -73,6 +79,8 @@ export default function ItemForm({
         <label className="block">
           <span>WhatsApp</span>
           <input
+            id="whatsapp"
+            name="whatsapp"
             className="border p-2 w-full"
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
@@ -83,6 +91,8 @@ export default function ItemForm({
       <label className="block">
         <span>Observación</span>
         <input
+          id="note"
+          name="note"
           className="border p-2 w-full"
           value={note}
           onChange={(e) => setNote(e.target.value)}
