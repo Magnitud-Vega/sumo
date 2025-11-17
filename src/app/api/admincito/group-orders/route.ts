@@ -1,3 +1,4 @@
+// app/api/admincito/group-orders/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createGroupOrderSchema } from "@/lib/schema";
@@ -11,8 +12,9 @@ export async function POST(req: NextRequest) {
     const exists = await prisma.groupOrder.findUnique({
       where: { slug: data.slug },
     });
-    if (exists)
+    if (exists) {
       return NextResponse.json({ error: "Slug ya existe" }, { status: 409 });
+    }
 
     const group = await prisma.groupOrder.create({
       data: {
@@ -24,11 +26,18 @@ export async function POST(req: NextRequest) {
         minItems: data.minItems,
         splitStrategy: data.splitStrategy,
         adminPin: data.adminPin,
+        companyName: data.companyName,
+        companyWhatsapp: data.companyWhatsapp,
+        bankName: data.bankName,
+        bankHolder: data.bankHolder,
+        bankAccount: data.bankAccount, // o el nombre real en tu modelo
+        bankDoc: data.bankDoc,
       },
     });
 
     return NextResponse.json(group);
   } catch (e: any) {
+    console.error(e);
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
 }

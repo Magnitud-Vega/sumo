@@ -55,6 +55,7 @@ model GroupOrder {
   bankHolder      String      // Titular
   bankAccount     String      // Número de cuenta o alias
   bankDoc         String      // RUC o CI
+  bankAlias       String?
 }
 
 model OrderLine {

@@ -1,17 +1,16 @@
 // app/api/admincito/order-lines/[orderLineId]/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { LineStatus } from "@prisma/client";
 
-interface Params {
-  params: {
-    orderLineId: string;
-  };
-}
-
-export async function PATCH(req: Request, { params }: Params) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ orderLineId: string }> }
+) {
   try {
-    const { orderLineId } = params;
+    // params es una Promise según el tipo que Next está esperando
+    const { orderLineId } = await params;
+
     const body = await req.json();
     const { status } = body as { status: LineStatus };
 
@@ -22,7 +21,6 @@ export async function PATCH(req: Request, { params }: Params) {
       );
     }
 
-    // Podrías validar también que la línea esté en PENDING antes de cambiar:
     const existing = await prisma.orderLine.findUnique({
       where: { id: orderLineId },
     });
