@@ -96,7 +96,7 @@ body {
     color: var(--sumo-primary);
   }
   .text-sumo-secondary {
-    color: var(--sumo-secondary);
+    color: var(--sumo-text-secondary);
   }
   .text-sumo-accent {
     color: var(--sumo-accent);
@@ -156,7 +156,7 @@ body {
  */
 @layer components {
   .btn-sumo {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     background-color: var(--sumo-primary);
     color: #ffffff;
     border: 1px solid transparent;
@@ -167,7 +167,7 @@ body {
   }
 
   .btn-sumo-secondary {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     background-color: var(--sumo-secondary);
     color: #0f172a;
     border: 1px solid transparent;
@@ -178,7 +178,7 @@ body {
   }
 
   .btn-sumo-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors;
+    @apply inline-flex items-center justify-center rounded-sm px-3 py-2 text-sm font-medium transition-colors;
     background-color: transparent;
     color: var(--sumo-primary);
     border: 1px solid transparent;
@@ -189,7 +189,7 @@ body {
   }
 
   .btn-sumo-danger {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors;
+    @apply inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-semibold transition-colors;
     background-color: var(--sumo-danger);
     color: #fef2f2;
   }
@@ -214,7 +214,7 @@ body {
  */
 @layer components {
   .card-sumo {
-    @apply rounded-2xl border shadow-sm p-4 md:p-6;
+    @apply rounded-md border shadow-sm p-4 md:p-6;
     background-color: var(--sumo-surface);
     border-color: var(--sumo-border);
   }
@@ -230,7 +230,7 @@ body {
 
   .card-sumo-subtitle {
     @apply text-xs md:text-sm;
-    color: var(--sumo-text-muted);
+    color: var(--sumo-text-secondary);
   }
 
   .card-sumo-badge {
@@ -291,7 +291,7 @@ body {
 
   .table-sumo th {
     @apply text-left text-xs font-semibold uppercase tracking-wide border-b;
-    color: var(--sumo-text-muted);
+    color: var(--sumo-text-secondary);
     border-color: var(--sumo-border);
   }
 

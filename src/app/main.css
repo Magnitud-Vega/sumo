@@ -1,0 +1,82 @@
+/* ============================
+   STEPS – "Cómo funciona SUMO"
+   ============================ */
+
+.card-step {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.2rem;
+  padding: 1rem;
+  background-color: var(--sumo-muted);
+  /* Para que el contenido se vea bien sobre la imagen */
+  color: var(--sumo-text-primary);
+}
+
+.card-step-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Capa de background (imagen + filtro) */
+.card-step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Filtro base (modo light) */
+  /* filter: brightness(0.98) contrast(1.05) saturate(1.05);
+  opacity: 0.6; */
+  filter: brightness(0.6) contrast(1.05) saturate(1.05);
+  pointer-events: none;
+}
+
+/* Ajustes para modo dark (cuando lo tengas implementado) */
+html[data-theme="dark"] .card-step::before {
+  /* filter: brightness(0.6) contrast(1.15) saturate(1.1);
+  opacity: 0.6; */
+  filter: brightness(0.4) contrast(1.05) saturate(1.05);
+}
+
+/* Imágenes específicas por paso 
+   👉 Cambiá las rutas /images/... por las que quieras usar */
+.card-step--1::before {
+  background-image: url("/grupo.jpg");
+}
+
+.card-step--2::before {
+  background-image: url("/pedido.jpg");
+}
+
+.card-step--3::before {
+  background-image: url("/pago.jpg");
+}
+
+/* Opcional: ligero blur para que el texto destaque aún más */
+html[data-theme="dark"] .card-step::before {
+  backdrop-filter: blur(2px);
+}
+
+/* ============================
+   AUDIENCIA – "Para quién es SUMO"
+   Reutiliza card-step + nuevos fondos
+   ============================ */
+
+/* Card base: ya la tenés como .card-step, la reutilizamos */
+/* Solo definimos variantes de imagen según el tipo de audiencia */
+
+.card-step--office::before {
+  /* Equipos en oficina */
+  background-image: url("/oficina.jpg");
+}
+
+.card-step--restaurant::before {
+  /* Restaurantes y dark kitchens */
+  background-image: url("/restaurante.jpg");
+}
+
+.card-step--organizer::before {
+  /* Emprendedores y organizadores */
+  background-image: url("/emprendedor.jpg");
+}
