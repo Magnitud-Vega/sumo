@@ -1,19 +1,40 @@
-// app/admin/group-order/[orderId]/OrderLinesTable.tsx
+// app/admin/group-orders/[orderId]/OrderLinesTable.tsx
 "use client";
 
-import { useState, useTransition } from "react";
-import type { OrderLine, LineStatus } from "@prisma/client";
+import { useMemo, useState, useTransition } from "react";
+import type { OrderLine, GroupOrder } from "@prisma/client";
+import { computeDeliveryPreview } from "@/lib/order-preview";
 
 interface OrderLinesTableProps {
   initialLines: OrderLine[];
+  status: GroupOrder["status"];
+  deliveryCostGs: number;
+  splitStrategy: GroupOrder["splitStrategy"];
 }
 
 export default function OrderLinesTable({
   initialLines,
+  status,
+  deliveryCostGs,
+  splitStrategy,
 }: OrderLinesTableProps) {
   const [lines, setLines] = useState(initialLines);
   const [isPending, startTransition] = useTransition();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Siempre recalculamos el preview en base al estado actual de `lines`
+  const preview = useMemo(
+    () =>
+      computeDeliveryPreview(
+        { status, deliveryCostGs, splitStrategy } as any,
+        lines
+      ),
+    [status, deliveryCostGs, splitStrategy, lines]
+  );
+  const previewById = useMemo(
+    () => Object.fromEntries(preview.lines.map((l) => [l.id, l])),
+    [preview.lines]
+  );
 
   const handleMarkAsPaid = (id: string) => {
     setUpdatingId(id);
@@ -21,10 +42,8 @@ export default function OrderLinesTable({
       try {
         const res = await fetch(`/api/admin/order-lines/${id}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "PAID" as LineStatus }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "PAID" }),
         });
 
         if (!res.ok) {
@@ -49,6 +68,16 @@ export default function OrderLinesTable({
 
   return (
     <div className="mt-4 overflow-x-auto">
+      {/* Podés mostrar un resumen también acá */}
+      {status === "OPEN" && (
+        <p className="text-sumo-xs text-sumo-muted mb-2">
+          Totales estimados · Subtotal:{" "}
+          {preview.sumSubtotal.toLocaleString("es-PY")} Gs · Delivery:{" "}
+          {preview.sumEstimatedDelivery.toLocaleString("es-PY")} Gs · Total:{" "}
+          {preview.sumEstimatedTotal.toLocaleString("es-PY")} Gs
+        </p>
+      )}
+
       <table className="table-sumo">
         <thead>
           <tr>
@@ -57,8 +86,12 @@ export default function OrderLinesTable({
             <th>Pago</th>
             <th>Item</th>
             <th className="text-right">Subtotal (Gs)</th>
-            <th className="text-right">Delivery (Gs)</th>
-            <th className="text-right">Total (Gs)</th>
+            <th className="text-right">
+              Delivery {status === "OPEN" && " (estimado)"} (Gs)
+            </th>
+            <th className="text-right">
+              Total {status === "OPEN" && " (estimado)"} (Gs)
+            </th>
             <th className="text-center">Estado</th>
             <th className="text-center">Acciones</th>
           </tr>
@@ -88,6 +121,14 @@ export default function OrderLinesTable({
                 ? "table-sumo-status-paid"
                 : "table-sumo-status-pending";
 
+            const previewLine = previewById[line.id];
+            const deliveryToShow =
+              status === "OPEN"
+                ? previewLine.estimatedDeliveryShareGs
+                : line.deliveryShareGs;
+            const totalToShow =
+              status === "OPEN" ? previewLine.estimatedTotalGs : line.totalGs;
+
             return (
               <tr key={line.id}>
                 <td className="font-medium">{line.name}</td>
@@ -95,6 +136,7 @@ export default function OrderLinesTable({
                   {line.whatsapp}
                 </td>
                 <td className="text-sumo-sm">
+                  {/* mismo mapping de métodos que ya tenías */}
                   {line.payMethod === "CASH"
                     ? "Efectivo"
                     : line.payMethod === "TRANSFER"
@@ -112,10 +154,10 @@ export default function OrderLinesTable({
                   {line.subtotalGs.toLocaleString("es-PY")}
                 </td>
                 <td className="text-right">
-                  {line.deliveryShareGs.toLocaleString("es-PY")}
+                  {deliveryToShow.toLocaleString("es-PY")}
                 </td>
                 <td className="text-right">
-                  {line.totalGs.toLocaleString("es-PY")}
+                  {totalToShow.toLocaleString("es-PY")}
                 </td>
                 <td className="text-center">
                   <span className={`table-sumo-status-pill ${statusPillClass}`}>
@@ -141,6 +183,6 @@ export default function OrderLinesTable({
           })}
         </tbody>
       </table>
-    </div>  
+    </div>
   );
 }

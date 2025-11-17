@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { GroupOrder, Menu, OrderLine, MenuItem } from "@prisma/client";
 import BankInfoCard from "./BankInfoCard";
 import ItemForm from "./OrderItemForm";
+import { computeDeliveryPreview } from "@/lib/order-preview";
 
 type Status = GroupOrder["status"];
 
@@ -78,21 +79,20 @@ export default async function OrderPage({ params }: OrderPageProps) {
   const order = await prisma.groupOrder.findUnique({
     where: { slug },
     include: {
-      menu: {
-        include: {
-          items: true,
-        },
-      },
+      menu: { include: { items: true } },
       lines: { orderBy: { createdAt: "asc" } },
     },
   });
 
-  if (!order) {
-    notFound();
-  }
+  if (!order) notFound();
 
   const isClosedOrDelivered =
     order.status === "CLOSED" || order.status === "DELIVERED";
+
+  // calculamos el preview para TODAS las líneas
+  const preview = computeDeliveryPreview(order, order.lines);
+  // Para lookup rápido por id
+  const previewById = Object.fromEntries(preview.lines.map((l) => [l.id, l]));
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -148,6 +148,18 @@ export default async function OrderPage({ params }: OrderPageProps) {
           Detalle de pedidos
         </h2>
 
+        {/* Podés mostrar también totales estimados si está OPEN */}
+        {order.status === "OPEN" && (
+          <p className="text-sumo-xs text-sumo-muted">
+            Los montos de delivery y total son <strong>estimados</strong> y
+            pueden cambiar hasta el cierre del pedido.
+            <br />
+            Subtotal actual: {formatGs(preview.sumSubtotal)} Gs · Delivery
+            estimado: {formatGs(preview.sumEstimatedDelivery)} Gs · Total
+            estimado: {formatGs(preview.sumEstimatedTotal)} Gs
+          </p>
+        )}
+
         <div className="overflow-x-auto">
           <table className="table-sumo">
             <thead>
@@ -155,8 +167,12 @@ export default async function OrderPage({ params }: OrderPageProps) {
                 <th>Nombre</th>
                 <th>Ítem del menú</th>
                 <th className="text-right">Subtotal (Gs)</th>
-                <th className="text-right">Delivery (Gs)</th>
-                <th className="text-right">Total (Gs)</th>
+                <th className="text-right">
+                  Delivery {order.status === "OPEN" && " (estimado)"} (Gs)
+                </th>
+                <th className="text-right">
+                  Total {order.status === "OPEN" && " (estimado)"} (Gs)
+                </th>
                 <th className="text-center">Pago</th>
                 {isClosedOrDelivered && (
                   <th className="text-center">Acciones</th>
@@ -176,18 +192,27 @@ export default async function OrderPage({ params }: OrderPageProps) {
               )}
 
               {order.lines.map((line) => {
+                const previewLine = previewById[line.id];
                 const paymentLabel = mapLineStatusLabel(line.status);
                 const isPending = line.status === "PENDING";
+
+                const deliveryToShow =
+                  order.status === "OPEN"
+                    ? previewLine.estimatedDeliveryShareGs
+                    : line.deliveryShareGs;
+
+                const totalToShow =
+                  order.status === "OPEN"
+                    ? previewLine.estimatedTotalGs
+                    : line.totalGs;
 
                 return (
                   <tr key={line.id}>
                     <td className="font-medium">{line.name}</td>
                     <td>{line.itemName}</td>
                     <td className="text-right">{formatGs(line.subtotalGs)}</td>
-                    <td className="text-right">
-                      {formatGs(line.deliveryShareGs)}
-                    </td>
-                    <td className="text-right">{formatGs(line.totalGs)}</td>
+                    <td className="text-right">{formatGs(deliveryToShow)}</td>
+                    <td className="text-right">{formatGs(totalToShow)}</td>
                     <td className="text-center">
                       <span
                         className={`table-sumo-status-pill ${
@@ -218,7 +243,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                               )}
                               target="_blank"
                               rel="noreferrer"
-                              className="btn-sumo text-[11px] px-3 py-1"
+                              className="btn-sumo-secondary text-[11px] px-3 py-1"
                             >
                               Confirmar pago por WhatsApp
                             </a>

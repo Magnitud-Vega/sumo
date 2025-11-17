@@ -1,3 +1,4 @@
+// src/lib/calc.ts
 export type SplitMode = "EVEN" | "WEIGHTED";
 
 /**

@@ -112,10 +112,10 @@ export default function ItemForm({
               onChange={(e) => setPayMethod(e.target.value)}
             >
               <option value="CASH">Efectivo</option>
-              <option value="QR">QR</option>
+              {/* <option value="QR">QR</option> */}
               <option value="TRANSFER">Transferencia</option>
-              <option value="TC">Tarjeta Crédito</option>
-              <option value="TD">Tarjeta Débito</option>
+              {/* <option value="TC">Tarjeta Crédito</option>
+              <option value="TD">Tarjeta Débito</option> */}
             </select>
           </label>
         </div>

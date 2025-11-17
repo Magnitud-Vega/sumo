@@ -1,9 +1,9 @@
+// src/lib/order-close.ts
 import { prisma } from "@/lib/db";
-import { splitDelivery } from "@/lib/calc";
-import { sendWhatsAppTemplate, sendWhatsAppText, toGs } from "@/lib/whatsapp";
+import { computeDeliveryPreview } from "./order-preview";
+// import { sendWhatsAppTemplate, sendWhatsAppText, toGs } from "@/lib/whatsapp";
 
 export async function closeGroupOrderById(groupOrderId: string) {
-  // 1) Trae el evento + líneas
   const group = await prisma.groupOrder.findUnique({
     where: { id: groupOrderId },
     include: { lines: true },
@@ -12,7 +12,7 @@ export async function closeGroupOrderById(groupOrderId: string) {
   if (group.status !== "OPEN")
     return { ok: true, alreadyClosed: true, groupId: group.id };
 
-  // 2) Valida mínimos
+  // Validaciones de mínimos (igual que antes)...
   const itemCount = group.lines.reduce((a, l) => a + l.qty, 0);
   const subtotalSum = group.lines.reduce((a, l) => a + l.subtotalGs, 0);
 
@@ -51,25 +51,23 @@ export async function closeGroupOrderById(groupOrderId: string) {
     };
   }
 
-  // 3) Calcula prorrateo de delivery
-  const subtotals = group.lines.map((l) => l.subtotalGs);
-  const shares = splitDelivery(
-    group.deliveryCostGs,
-    subtotals,
-    group.splitStrategy as any
+  // 👇 Usamos la librería para calcular los valores definitivos
+  const { lines: previewLines } = computeDeliveryPreview(
+    {
+      status: "OPEN",
+      deliveryCostGs: group.deliveryCostGs,
+      splitStrategy: group.splitStrategy,
+    },
+    group.lines
   );
 
-  // 4) Aplica cambios en transacción
   await prisma.$transaction(async (tx) => {
-    for (let i = 0; i < group.lines.length; i++) {
-      const line = group.lines[i];
-      const deliveryShare = shares[i];
-      const total = line.subtotalGs + deliveryShare;
+    for (const pl of previewLines) {
       await tx.orderLine.update({
-        where: { id: line.id },
+        where: { id: pl.id },
         data: {
-          deliveryShareGs: deliveryShare,
-          totalGs: total,
+          deliveryShareGs: pl.estimatedDeliveryShareGs,
+          totalGs: pl.estimatedTotalGs,
           status: "FINALIZED",
         },
       });
@@ -81,11 +79,7 @@ export async function closeGroupOrderById(groupOrderId: string) {
     });
   });
 
-  // reenviá info actualizada para cada línea
-  const lines = await prisma.orderLine.findMany({
-    where: { groupOrderId: group.id },
-  });
-  for (const l of lines) {
+  for (const l of previewLines) {
     try {
       // await sendWhatsAppTemplate({
       //   to: l.whatsapp.startsWith("+")
@@ -123,7 +117,6 @@ export async function closeGroupOrderById(groupOrderId: string) {
     closed: true,
     subtotalSum,
     itemCount,
-    shares,
     groupId: group.id,
   };
 }
