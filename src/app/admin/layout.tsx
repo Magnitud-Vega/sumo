@@ -1,6 +1,7 @@
 // app/admin/layout.tsx
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -27,6 +28,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             >
               Eventos
             </Link>
+            <ThemeToggle />
           </nav>
         </div>
       </header>
