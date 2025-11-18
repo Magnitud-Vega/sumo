@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Sumo App",
-  description: "Aplicacion para ordenar en grupos",
+  description: "Aplicacion para ordenar en grupo",
 };
 
 export default function RootLayout({
