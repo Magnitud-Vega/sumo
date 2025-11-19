@@ -1,4 +1,3 @@
-// app/admin/group-orders/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -52,8 +51,8 @@ function statusClasses(status: G["status"]) {
 
 export default function AdminPage() {
   const [groups, setGroups] = useState<G[]>([]);
-  const [loading, setLoading] = useState(false);
   const [closingId, setClosingId] = useState<string | null>(null);
+  const [deliveringId, setDeliveringId] = useState<string | null>(null);
 
   async function load() {
     const res = await fetch("/api/admincito/group-orders/list");
@@ -65,22 +64,55 @@ export default function AdminPage() {
   }, []);
 
   async function closeNow(id: string) {
-    setLoading(true);
     setClosingId(id);
-    const res = await fetch(`/api/admincito/group-orders/${id}/close`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ adminPin: "1234" }),
-    });
-    setLoading(false);
-    setClosingId(null);
+    try {
+      const res = await fetch(`/api/admincito/group-orders/${id}/close`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminPin: "1234" }),
+      });
 
-    if (!res.ok) {
-      const e = await res.json();
-      alert(e.error || "Error al cerrar");
-    } else {
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        alert(e.error || "Error al cerrar el evento");
+        return;
+      }
+
       await load();
-      alert("Evento cerrado/calculado");
+      alert("Evento cerrado y delivery calculado ✅");
+    } finally {
+      setClosingId(null);
+    }
+  }
+
+  async function deliverNow(id: string) {
+    if (
+      !confirm(
+        "¿Marcar este evento como ENTREGADO y enviar avisos por WhatsApp a todos?"
+      )
+    ) {
+      return;
+    }
+
+    setDeliveringId(id);
+    try {
+      const res = await fetch(`/api/admincito/group-orders/${id}/deliver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.error("Error deliver:", data);
+        alert(data.error || "Error al marcar como entregado");
+        return;
+      }
+
+      await load();
+      alert("Evento marcado como ENTREGADO y avisos enviados por WhatsApp ✅");
+    } finally {
+      setDeliveringId(null);
     }
   }
 
@@ -94,21 +126,16 @@ export default function AdminPage() {
               SUMO · Eventos de grupo
             </h1>
             <p className="card-sumo-subtitle">
-              Gestioná tus pedidos grupales, cerrá eventos y revisá los detalles
-              de cada orden.
+              Gestioná tus pedidos grupales, cerrá eventos, marcá entregas y
+              revisá los detalles de cada orden.
             </p>
           </div>
 
-          {/* Aquí podrías agregar un botón para crear evento, si lo tenés */}
+          {/* Agregar un botón para crear evento */}
           {/* <button className="btn-sumo text-xs md:text-sm">
             + Nuevo evento
           </button> */}
         </div>
-
-        {/* Si tenés tu UI de crear evento, la podés envolver en un div así: */}
-        {/* <div className="mt-4">
-          ... UI CREAR EVENTO ...
-        </div> */}
       </header>
 
       {/* LISTA DE EVENTOS */}
@@ -137,60 +164,86 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {groups.map((g) => (
-                <tr key={g.id}>
-                  <td className="font-medium">{g.slug}</td>
-                  <td>{g.menu}</td>
-                  <td className="text-center">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusClasses(
-                        g.status
-                      )}`}
-                    >
-                      {mapStatusLabel(g.status)}
-                    </span>
-                  </td>
-                  <td className="text-sumo-sm text-sumo-muted">
-                    {new Date(g.deadlineTs).toLocaleString("es-PY")}
-                  </td>
-                  <td className="text-center">{g.items}</td>
-                  <td className="text-right">
-                    {formatGs(g.subtotal)}{" "}
-                    <span className="text-sumo-muted">Gs</span>
-                  </td>
-                  <td className="text-right">
-                    {formatGs(g.total)}{" "}
-                    <span className="text-sumo-muted">Gs</span>
-                  </td>
-                  <td>
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      {g.status === "OPEN" && (
-                        <button
-                          disabled={loading && closingId === g.id}
-                          className="btn-sumo text-xs px-3 py-1"
-                          onClick={() => closeNow(g.id)}
-                        >
-                          {loading && closingId === g.id
-                            ? "Cerrando..."
-                            : "Cerrar ahora"}
-                        </button>
-                      )}
-                      {g.status !== "OPEN" && (
-                        <span className="text-sumo-xs text-sumo-muted">
-                          Cierre realizado
-                        </span>
-                      )}
+              {groups.map((g) => {
+                const isClosing = closingId === g.id;
+                const isDelivering = deliveringId === g.id;
 
-                      <Link
-                        href={`/admin/group-orders/${g.id}`}
-                        className="btn-sumo-ghost text-xs px-3 py-1"
+                return (
+                  <tr key={g.id}>
+                    <td className="font-medium">{g.slug}</td>
+                    <td>{g.menu}</td>
+                    <td className="text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusClasses(
+                          g.status
+                        )}`}
                       >
-                        Ver detalle
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {mapStatusLabel(g.status)}
+                      </span>
+                    </td>
+                    <td className="text-sumo-sm text-sumo-muted">
+                      {new Date(g.deadlineTs).toLocaleString("es-PY")}
+                    </td>
+                    <td className="text-center">{g.items}</td>
+                    <td className="text-right">
+                      {formatGs(g.subtotal)}{" "}
+                      <span className="text-sumo-muted">Gs</span>
+                    </td>
+                    <td className="text-right">
+                      {formatGs(g.total)}{" "}
+                      <span className="text-sumo-muted">Gs</span>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {/* Estado OPEN → botón Cerrar ahora */}
+                        {g.status === "OPEN" && (
+                          <button
+                            disabled={isClosing || isDelivering}
+                            className="btn-sumo text-xs px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => closeNow(g.id)}
+                          >
+                            {isClosing ? "Cerrando..." : "Cerrar ahora"}
+                          </button>
+                        )}
+
+                        {/* Estado CLOSED → botón Marcar entregado + avisar */}
+                        {g.status === "CLOSED" && (
+                          <button
+                            disabled={isDelivering || isClosing}
+                            className="btn-sumo text-xs px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => deliverNow(g.id)}
+                          >
+                            {isDelivering
+                              ? "Enviando avisos..."
+                              : "Marcar entregado y avisar"}
+                          </button>
+                        )}
+
+                        {/* Estado DELIVERED → solo info */}
+                        {g.status === "DELIVERED" && (
+                          <span className="text-sumo-xs text-emerald-700">
+                            Entregado y notificado
+                          </span>
+                        )}
+
+                        {/* Estado CANCELLED → solo info */}
+                        {g.status === "CANCELLED" && (
+                          <span className="text-sumo-xs text-red-600">
+                            Evento cancelado
+                          </span>
+                        )}
+
+                        <Link
+                          href={`/admin/group-orders/${g.id}`}
+                          className="btn-sumo-ghost text-xs px-3 py-1"
+                        >
+                          Ver detalle
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
 
               {groups.length === 0 && (
                 <tr>

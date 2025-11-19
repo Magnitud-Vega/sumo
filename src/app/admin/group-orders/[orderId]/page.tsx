@@ -49,6 +49,11 @@ export default async function GroupOrderDetailPage({
           status={groupOrder.status}
           deliveryCostGs={groupOrder.deliveryCostGs}
           splitStrategy={groupOrder.splitStrategy}
+          bankDetails={
+            groupOrder.bankName
+              ? `${groupOrder.bankName} · ${groupOrder.bankHolder} · ${groupOrder.bankAccount}`
+              : undefined
+          }
         />
       </section>
     </div>

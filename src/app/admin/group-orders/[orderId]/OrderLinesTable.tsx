@@ -10,6 +10,7 @@ interface OrderLinesTableProps {
   status: GroupOrder["status"];
   deliveryCostGs: number;
   splitStrategy: GroupOrder["splitStrategy"];
+  bankDetails?: string;
 }
 
 export default function OrderLinesTable({
@@ -17,10 +18,12 @@ export default function OrderLinesTable({
   status,
   deliveryCostGs,
   splitStrategy,
+  bankDetails,
 }: OrderLinesTableProps) {
   const [lines, setLines] = useState(initialLines);
   const [isPending, startTransition] = useTransition();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [remindingId, setRemindingId] = useState<string | null>(null);
 
   // Siempre recalculamos el preview en base al estado actual de `lines`
   const preview = useMemo(
@@ -40,7 +43,7 @@ export default function OrderLinesTable({
     setUpdatingId(id);
     startTransition(async () => {
       try {
-        const res = await fetch(`/api/admin/order-lines/${id}`, {
+        const res = await fetch(`/api/admincito/order-lines/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "PAID" }),
@@ -62,6 +65,33 @@ export default function OrderLinesTable({
         console.error("Error en la petición", err);
       } finally {
         setUpdatingId(null);
+      }
+    });
+  };
+
+  const handleSendReminder = (id: string) => {
+    setRemindingId(id);
+    startTransition(async () => {
+      try {
+        const res = await fetch(`/api/admincito/order-lines/${id}/reminder`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bankDetailsOverride: bankDetails }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("Error al enviar recordatorio", err);
+          alert(err.error || "No se pudo enviar el recordatorio");
+          return;
+        }
+
+        alert("Recordatorio de pago enviado por WhatsApp ✅");
+      } catch (err) {
+        console.error("Error en la petición", err);
+        alert("Error inesperado enviando el recordatorio");
+      } finally {
+        setRemindingId(null);
       }
     });
   };
@@ -129,6 +159,10 @@ export default function OrderLinesTable({
             const totalToShow =
               status === "OPEN" ? previewLine.estimatedTotalGs : line.totalGs;
 
+            const canSendReminder =
+              (status === "DELIVERED" || status == "CLOSED") &&
+              line.status === "PENDING";
+
             return (
               <tr key={line.id}>
                 <td className="font-medium">{line.name}</td>
@@ -136,7 +170,6 @@ export default function OrderLinesTable({
                   {line.whatsapp}
                 </td>
                 <td className="text-sumo-sm">
-                  {/* mismo mapping de métodos que ya tenías */}
                   {line.payMethod === "CASH"
                     ? "Efectivo"
                     : line.payMethod === "TRANSFER"
@@ -149,7 +182,12 @@ export default function OrderLinesTable({
                     ? "QR"
                     : line.payMethod}
                 </td>
-                <td>{line.itemName}</td>
+                <td>
+                  {line.itemName}{" "}
+                  <span className="text-sumo-muted">
+                    {line.note ? `(${line.note})` : ""}
+                  </span>
+                </td>
                 <td className="text-right">
                   {line.subtotalGs.toLocaleString("es-PY")}
                 </td>
@@ -175,6 +213,18 @@ export default function OrderLinesTable({
                       {isPending && updatingId === line.id
                         ? "Actualizando..."
                         : "Cambiar a PAGADO"}
+                    </button>
+                  )}
+                  {canSendReminder && (
+                    <button
+                      type="button"
+                      onClick={() => handleSendReminder(line.id)}
+                      disabled={isPending && remindingId === line.id}
+                      className="btn-sumo-secondary text-[11px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isPending && remindingId === line.id
+                        ? "Enviando..."
+                        : "Recordatorio de pago"}
                     </button>
                   )}
                 </td>

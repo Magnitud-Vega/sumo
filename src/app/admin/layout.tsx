@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
           <nav className="flex items-center gap-3 text-sumo-sm">
             <Link
-              href="/admin/order-groups/create"
+              href="/admin/group-orders/create"
               className="text-sumo-muted hover:text-sumo-primary"
             >
               Crear evento

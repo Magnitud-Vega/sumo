@@ -1,4 +1,4 @@
-// app/admin/order-groups/create/page.tsx
+// app/admin/group-orders/create/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
