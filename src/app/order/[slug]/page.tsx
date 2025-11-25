@@ -79,8 +79,17 @@ export default async function OrderPage({ params }: OrderPageProps) {
   const order = await prisma.groupOrder.findUnique({
     where: { slug },
     include: {
-      menu: { include: { items: true } },
-      lines: { orderBy: { createdAt: "asc" } },
+      menu: {
+        include: {
+          items: {
+            where: { isActive: true },
+            orderBy: { name: "asc" }, // opcional pero recomendable
+          },
+        },
+      },
+      lines: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
