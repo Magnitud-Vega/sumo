@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/db";
 import "./main.css";
 import type { GroupOrder, Menu } from "@prisma/client";
+import Image from "next/image";
+import NameLogo from "@/../public/name-logo.png";
 
 type GroupOrderWithMenu = GroupOrder & {
   menu: Menu;
@@ -38,12 +40,19 @@ export default async function HomePage() {
       <main className="max-w-5xl mx-auto px-4 py-10 space-y-6">
         {/* HERO / PRESENTACIÓN */}
         <section className="card-sumo">
-          <p className="text-sumo-xs text-sumo-secondary uppercase tracking-wide">
-            Pedido grupal, sin caos
+          <div className="flex items-center">
+            <Image src={NameLogo} alt="SUMO GO" width={80} height={80} />
+            <h3>Sumo tu pedido, vos sumás el grupo.</h3>
+          </div>
+          {/* <p className="text-sumo-xs text-sumo-secondary uppercase tracking-wide">
+            Sumo tu pedido, vos sumás el grupo.
           </p>
-          <h1 className="font-brand text-sumo-primary text-sumo-3xl md:text-3xl">
-            SUMO: organizá pedidos grupales de forma rápida
-          </h1>
+          <h1 className="font-brand font-extrabold text-sumo-primary text-sumo-3xl md:text-3xl">
+            S<span className="text-sumo-highlight">UMO</span>
+            <span className="font-medium text-sumo-secondary">
+              : organizá pedidos grupales de forma rápida
+            </span>
+          </h1> */}
           <div className="flex flex-col md:flex-row gap-8 md:items-center">
             <div className="flex-1 space-y-3">
               <p className="text-sumo-base text-sumo-secondary">
@@ -67,12 +76,12 @@ export default async function HomePage() {
                   rel="noreferrer"
                   className="btn-sumo-secondary"
                 >
-                  Quiero usar SUMO
+                  Quiero probar SUMO
                 </a>
-                <span className="text-sumo-xs text-sumo-muted">
+                {/* <span className="text-sumo-xs text-sumo-muted">
                   Escribime por WhatsApp y te ayudo a implementarlo en tu
                   empresa.
-                </span>
+                </span> */}
               </div>
             </div>
 

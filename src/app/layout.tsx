@@ -4,8 +4,8 @@ import "./globals.css";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "Sumo App",
-  description: "Aplicacion para ordenar en grupo",
+  title: "SUMO GO",
+  description: "Sumo tu pedido, vos sumás el grupo.",
 };
 
 export default function RootLayout({

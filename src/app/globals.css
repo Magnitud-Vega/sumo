@@ -19,6 +19,7 @@
   --sumo-text-primary: #0f172a; /* Texto principal */
   --sumo-text-secondary: #475569; /* Texto secundario */
   --sumo-text-muted: #94a3b8; /* Etiquetas, helpers */
+  --sumo-text-highlight: #a3e635;
 
   --sumo-danger: #ef4444; /* (opcional) errores */
   --sumo-success: #16a34a; /* (opcional) estados OK */
@@ -39,6 +40,7 @@
   --sumo-text-primary: #f8fafc;
   --sumo-text-secondary: #cbd5e1;
   --sumo-text-muted: #64748b;
+  --sumo-text-highlight: #bef264;
 
   --sumo-danger: #fca5a5;
   --sumo-success: #4ade80;
@@ -103,6 +105,9 @@ body {
   }
   .text-sumo-muted {
     color: var(--sumo-text-muted);
+  }
+  .text-sumo-highlight {
+    color: var(--sumo-text-highlight);
   }
 
   .border-sumo-primary {
