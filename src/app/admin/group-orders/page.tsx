@@ -119,7 +119,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="space-y-8">
       {/* HEADER / INTRO */}
       <header className="card-sumo">
         <div className="card-sumo-header">

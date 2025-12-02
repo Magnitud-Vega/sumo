@@ -27,7 +27,7 @@ export default async function GroupOrderDetailPage({
   if (!groupOrder) notFound();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="space-y-6">
       <section className="card-sumo space-y-2">
         <h1 className="card-sumo-title font-brand text-sumo-2xl">
           Orden de grupo: {groupOrder.slug}
