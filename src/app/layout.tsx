@@ -4,7 +4,10 @@ import "./globals.css";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "SUMO GO",
+  title: {
+    template: "%s | SUMO GO",
+    default: "SUMO GO",
+  },
   description: "Sumo tu pedido, vos sumás el grupo.",
 };
 
