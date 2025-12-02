@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Pizzbur Fran | CENA-MCHILL",
-  description: "Sumá tu pedido a la orden.",
+  description: "Hoy cenamos por el cumple de Jessy 🎉🎂🎈🥳🎁🍰✨",
 };
 
 export default function OrderSlug({ children }: { children: React.ReactNode }) {

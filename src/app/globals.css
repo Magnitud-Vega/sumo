@@ -109,6 +109,9 @@ body {
   .text-sumo-highlight {
     color: var(--sumo-text-highlight);
   }
+  .text-sumo-danger {
+    color: var(--sumo-danger);
+  }
 
   .border-sumo-primary {
     border-color: var(--sumo-primary);

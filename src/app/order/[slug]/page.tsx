@@ -148,13 +148,14 @@ export default async function OrderPage({ params }: OrderPageProps) {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center">
             <Image src={NameLogo} alt="SUMO GO" width={80} height={80} />
-            {/* <p className="text-sumo-xs text-sumo-muted">
-              Orden de grupo · {order.slug.toUpperCase()}
-            </p> */}
             <h1 className="card-sumo-title font-brand text-sumo-2xl text-sumo-primary">
               {order.menu.title}
             </h1>
           </div>
+          <p className="text-sumo-md text-sumo-danger">
+            {/* Orden de grupo · {order.slug.toUpperCase()} */}
+            🎁🍰 Hoy cenamos por el cumple de Jessy 🎉🎂🎈🥳
+          </p>
           <div className="flex flex-col items-start md:items-end gap-1">
             <span
               className={`inline-flex items-center table-sumo-status-pill ${
