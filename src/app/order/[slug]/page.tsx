@@ -41,13 +41,30 @@ function mapLineStatusLabel(status: OrderLine["status"]) {
   }
 }
 
+function mapPayMethodLabel(method: OrderLine["payMethod"]) {
+  switch (method) {
+    case "CASH":
+      return "Efectivo";
+    case "TRANSFER":
+      return "Transferencia bancaria";
+    case "TC":
+      return "Tarjeta de crédito";
+    case "TD":
+      return "Tarjeta de débito";
+    case "QR":
+      return "Pago por QR";
+    default:
+      return method;
+  }
+}
+
 function formatGs(value: number) {
   return value.toLocaleString("es-PY");
 }
 
 function normalizePhone(phone: string | null | undefined) {
   if (!phone) return "";
-  return phone.replace(/\D/g, "");
+  return phone.replace(/\D/g, ""); //.replace(/^0/, "595").replace("+", "");
 }
 
 function buildWhatsAppTransferMessage(
@@ -83,7 +100,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
         include: {
           items: {
             where: { isActive: true },
-            orderBy: { name: "asc" }, // opcional pero recomendable
+            orderBy: { name: "asc" },
           },
         },
       },
@@ -169,7 +186,8 @@ export default async function OrderPage({ params }: OrderPageProps) {
           </p>
         )}
 
-        <div className="overflow-x-auto">
+        {/* DESKTOP: table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="table-sumo">
             <thead>
               <tr>
@@ -215,10 +233,15 @@ export default async function OrderPage({ params }: OrderPageProps) {
                     ? previewLine.estimatedTotalGs
                     : line.totalGs;
 
+                const payMethodLabel = mapPayMethodLabel(line.payMethod);
+
                 return (
                   <tr key={line.id}>
                     <td className="font-medium">{line.name}</td>
-                    <td>{line.itemName}</td>
+                    <td>
+                      {line.itemName}{" "}
+                      <span className="text-sumo-secondary">({line.note})</span>
+                    </td>
                     <td className="text-right">{formatGs(line.subtotalGs)}</td>
                     <td className="text-right">{formatGs(deliveryToShow)}</td>
                     <td className="text-right">{formatGs(totalToShow)}</td>
@@ -230,7 +253,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                             : "table-sumo-status-pending"
                         }`}
                       >
-                        {paymentLabel}
+                        {payMethodLabel}: {paymentLabel}
                       </span>
                     </td>
 
@@ -238,8 +261,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                       <td className="text-center">
                         {isPending && line.payMethod === "CASH" && (
                           <p className="text-sumo-xs text-sumo-muted">
-                            Pago en efectivo. El administrador confirmará cuando
-                            lo reciba.
+                            El administrador confirmará tu pago en breve.
                           </p>
                         )}
 
@@ -257,8 +279,8 @@ export default async function OrderPage({ params }: OrderPageProps) {
                               Confirmar pago por WhatsApp
                             </a>
                             <p className="text-[10px] text-sumo-muted max-w-[200px]">
-                              Después de transferir, tocá el botón para avisar y
-                              adjuntar el comprobante desde WhatsApp.
+                              Avisá de tu pago y enviá tu comprobante por
+                              WhatsApp.
                             </p>
                           </div>
                         )}
@@ -280,6 +302,136 @@ export default async function OrderPage({ params }: OrderPageProps) {
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE: cards */}
+        <div className="space-y-3 md:hidden">
+          {order.lines.length === 0 && (
+            <p className="py-4 text-center text-sumo-muted italic text-sm">
+              No hay ítems cargados en este pedido todavía.
+            </p>
+          )}
+
+          {order.lines.map((line) => {
+            const previewLine = previewById[line.id];
+            const paymentLabel = mapLineStatusLabel(line.status);
+            const isPending = line.status === "PENDING";
+
+            const deliveryToShow =
+              order.status === "OPEN"
+                ? previewLine.estimatedDeliveryShareGs
+                : line.deliveryShareGs;
+
+            const totalToShow =
+              order.status === "OPEN"
+                ? previewLine.estimatedTotalGs
+                : line.totalGs;
+
+            const payMethodLabel = mapPayMethodLabel(line.payMethod);
+
+            return (
+              <div
+                key={line.id}
+                className="rounded-lg border border-sumo-soft bg-sumo-muted px-3 py-3 shadow-lg flex flex-col gap-2"
+              >
+                {/* Header: nombre + estado */}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sumo-sm font-bold text-sumo-primary">
+                      {line.name}
+                    </p>
+                    <p className="text-sumo-xs">
+                      {line.itemName} ({line.note})
+                    </p>
+                  </div>
+                  <span
+                    className={`table-sumo-status-pill ${
+                      line.status === "PAID"
+                        ? "table-sumo-status-paid"
+                        : "table-sumo-status-pending"
+                    }`}
+                  >
+                    {payMethodLabel}: {paymentLabel}
+                  </span>
+                </div>
+
+                {/* Montos */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sumo-xs mt-1">
+                  <div className="flex justify-between col-span-2">
+                    <span className="text-sumo-secondary">Subtotal</span>
+                    <span className="font-medium text-sumo-secondary">
+                      {formatGs(line.subtotalGs)} Gs
+                    </span>
+                  </div>
+                  <div className="flex justify-between col-span-2">
+                    <span className="text-sumo-secondary">
+                      Delivery
+                      {order.status === "OPEN" && " (estimado)"}
+                    </span>
+                    <span className="font-medium text-sumo-secondary">
+                      {formatGs(deliveryToShow)} Gs
+                    </span>
+                  </div>
+                  <div className="flex justify-between col-span-2 text-sumo-primary">
+                    <span className="font-bold">
+                      Total
+                      {order.status === "OPEN" && " (estimado)"}
+                    </span>
+                    <span className="font-bold">
+                      {formatGs(totalToShow)} Gs
+                    </span>
+                  </div>
+                </div>
+
+                {/* Pago */}
+                {/* <div className="mt-1 flex justify-between items-center text-sumo-xs">
+                  <span className="text-sumo-muted">Método de pago</span>
+                  <span className="font-medium">{payMethodLabel}</span>
+                </div> */}
+
+                {/* Acciones (solo cerrada/entregada) */}
+                {isClosedOrDelivered && (
+                  <div className="mt-2">
+                    {isPending && line.payMethod === "CASH" && (
+                      <p className="text-[11px] text-sumo-muted">
+                        El administrador confirmará tu pago en breve.
+                      </p>
+                    )}
+
+                    {isPending && line.payMethod === "TRANSFER" && (
+                      <div className="flex flex-col items-start gap-1">
+                        <a
+                          href={buildWhatsAppTransferMessage(
+                            line,
+                            order as GroupOrderWithRelations
+                          )}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn-sumo-secondary text-[11px] px-3 py-1"
+                        >
+                          Confirmar pago por WhatsApp
+                        </a>
+                        <p className="text-[10px] text-sumo-muted">
+                          Avisá de tu pago y enviá tu comprobante por WhatsApp.
+                        </p>
+                      </div>
+                    )}
+
+                    {(!isPending ||
+                      line.payMethod === "TC" ||
+                      line.payMethod === "TD" ||
+                      line.payMethod === "QR") &&
+                      !(isPending && line.payMethod === "TRANSFER") &&
+                      !(isPending && line.payMethod === "CASH") && (
+                        <p className="text-[11px] text-sumo-muted">
+                          No hay acciones disponibles.
+                        </p>
+                      )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

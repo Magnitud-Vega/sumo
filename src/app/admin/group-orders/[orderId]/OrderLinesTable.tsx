@@ -97,7 +97,7 @@ export default function OrderLinesTable({
   };
 
   return (
-    <div className="mt-4 overflow-x-auto">
+    <div className="mt-4 hidden md:block overflow-x-auto">
       {/* Podés mostrar un resumen también acá */}
       {status === "OPEN" && (
         <p className="text-sumo-xs text-sumo-muted mb-2">
@@ -160,7 +160,7 @@ export default function OrderLinesTable({
               status === "OPEN" ? previewLine.estimatedTotalGs : line.totalGs;
 
             const canSendReminder =
-              (status === "DELIVERED" || status == "CLOSED") &&
+              (status === "DELIVERED" || status === "CLOSED") &&
               line.status === "PENDING";
 
             return (

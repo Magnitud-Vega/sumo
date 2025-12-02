@@ -8,9 +8,44 @@ async function main() {
       items: {
         create: [
           { name: "Burger Muzza", priceGs: 27000, category: "Burgers" },
+          {
+            name: "Burger Muzza (Doble carne)",
+            priceGs: 37000,
+            category: "Burgers",
+          },
+          {
+            name: "Burger Muzza + Papas Chicas",
+            priceGs: 34000,
+            category: "Combo",
+          },
+          {
+            name: "Burger Muzza + Papas Medianas",
+            priceGs: 39000,
+            category: "Combo",
+          },
           { name: "Burger Cheddar", priceGs: 27000, category: "Burgers" },
+          {
+            name: "Burger Cheddar (Doble carne)",
+            priceGs: 37000,
+            category: "Burgers",
+          },
+          {
+            name: "Burger Cheddar + Papas Chicas",
+            priceGs: 34000,
+            category: "Combo",
+          },
+          {
+            name: "Burger Cheddar + Papas Medianas",
+            priceGs: 39000,
+            category: "Combo",
+          },
           { name: "Papas Chicas", priceGs: 7000, category: "Sides" },
           { name: "Papas Medianas", priceGs: 12000, category: "Sides" },
+          {
+            name: "Muzza (Sin Carne) p/ Cami ;-)",
+            priceGs: 22000,
+            category: "Sides",
+          },
         ],
       },
     },

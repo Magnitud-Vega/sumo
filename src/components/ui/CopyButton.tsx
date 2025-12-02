@@ -27,7 +27,7 @@ export function CopyButton({ value, label, className }: CopyButtonProps) {
       type="button"
       onClick={handleCopy}
       className={
-        "inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium hover:bg-gray-100 " +
+        "inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium btn-sumo hover:bg-gray-100 " +
         (className || "")
       }
     >

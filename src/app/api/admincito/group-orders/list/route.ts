@@ -22,6 +22,7 @@ export async function GET() {
       subtotal,
       items,
       total,
+      deliveryCostGs: g.deliveryCostGs,
     };
   });
 

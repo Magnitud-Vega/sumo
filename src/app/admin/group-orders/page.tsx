@@ -1,3 +1,4 @@
+// app/admin/group-orders/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ type G = {
   subtotal: number;
   items: number;
   total: number;
+  deliveryCostGs: number;
 };
 
 function formatGs(value: number) {
@@ -149,7 +151,8 @@ export default function AdminPage() {
           </p>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* DESKTOP: tabla */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="table-sumo">
             <thead>
               <tr>
@@ -220,18 +223,18 @@ export default function AdminPage() {
                         )}
 
                         {/* Estado DELIVERED → solo info */}
-                        {g.status === "DELIVERED" && (
+                        {/* {g.status === "DELIVERED" && (
                           <span className="text-sumo-xs text-emerald-700">
                             Entregado y notificado
                           </span>
-                        )}
+                        )} */}
 
                         {/* Estado CANCELLED → solo info */}
-                        {g.status === "CANCELLED" && (
+                        {/* {g.status === "CANCELLED" && (
                           <span className="text-sumo-xs text-red-600">
                             Evento cancelado
                           </span>
-                        )}
+                        )} */}
 
                         <Link
                           href={`/admin/group-orders/${g.id}`}
@@ -255,6 +258,122 @@ export default function AdminPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE: cards */}
+        <div className="space-y-3 md:hidden">
+          {groups.length === 0 && (
+            <p className="py-4 text-center text-sumo-muted italic text-sm">
+              Sin eventos por el momento. Creá tu primer pedido grupal para
+              comenzar 🙌
+            </p>
+          )}
+
+          {groups.map((g) => {
+            const isClosing = closingId === g.id;
+            const isDelivering = deliveringId === g.id;
+            const deadline = new Date(g.deadlineTs).toLocaleString("es-PY");
+
+            return (
+              <div
+                key={g.id}
+                className="rounded-lg border border-sumo-soft bg-sumo-muted px-3 py-3 shadow-lg flex flex-col gap-2"
+              >
+                {/* Header: slug + estado */}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sumo-sm font-bold text-sumo-primary">
+                      {g.slug}
+                    </p>
+                    <p className="text-sumo-xs text-sumo-secondary">{g.menu}</p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${statusClasses(
+                      g.status
+                    )}`}
+                  >
+                    {mapStatusLabel(g.status)}
+                  </span>
+                </div>
+
+                {/* Meta info */}
+                <div className="text-sumo-xs text-sumo-muted flex flex-col gap-1 mt-1">
+                  <div className="flex justify-between">
+                    <span>Deadline</span>
+                    <span className="font-medium">{deadline}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Ítems</span>
+                    <span className="font-medium">{g.items}</span>
+                  </div>
+                </div>
+
+                {/* Totales */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sumo-xs mt-1">
+                  <div className="flex justify-between col-span-2">
+                    <span className="text-sumo-secondary">Subtotal</span>
+                    <span className="font-medium text-sumo-secondary">
+                      {formatGs(g.subtotal)} Gs
+                    </span>
+                  </div>
+                  <div className="flex justify-between col-span-2">
+                    <span className="text-sumo-secondary">Delivery</span>
+                    <span className="font-medium text-sumo-secondary">
+                      {formatGs(g.deliveryCostGs)} Gs
+                    </span>
+                  </div>
+                  <div className="flex justify-between col-span-2 text-sumo-primary">
+                    <span className="font-bold">Total</span>
+                    <span className="font-bold">{formatGs(g.total)} Gs</span>
+                  </div>
+                </div>
+
+                {/* Acciones */}
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {g.status === "OPEN" && (
+                    <button
+                      disabled={isClosing || isDelivering}
+                      className="btn-sumo text-[11px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => closeNow(g.id)}
+                    >
+                      {isClosing ? "Cerrando..." : "Cerrar ahora"}
+                    </button>
+                  )}
+
+                  {g.status === "CLOSED" && (
+                    <button
+                      disabled={isDelivering || isClosing}
+                      className="btn-sumo text-[11px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => deliverNow(g.id)}
+                    >
+                      {isDelivering
+                        ? "Enviando avisos..."
+                        : "Marcar entregado y avisar"}
+                    </button>
+                  )}
+
+                  {/* {g.status === "DELIVERED" && (
+                    <span className="text-[11px] text-emerald-700">
+                      Entregado y notificado
+                    </span>
+                  )} */}
+
+                  {/* {g.status === "CANCELLED" && (
+                    <span className="text-[11px] text-red-600">
+                      Evento cancelado
+                    </span>
+                  )} */}
+
+                  <Link
+                    href={`/admin/group-orders/${g.id}`}
+                    className="btn-sumo text-[11px] px-3 py-1"
+                  >
+                    Ver detalle
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

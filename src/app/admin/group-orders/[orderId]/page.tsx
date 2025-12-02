@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import OrderLinesTable from "./OrderLinesTable";
 import type { GroupOrder } from "@prisma/client";
+import OrderLinesCard from "./OrderLinesCard";
 
 interface GroupOrderDetailPageProps {
   params: Promise<{ orderId: string }>;
@@ -54,6 +55,18 @@ export default async function GroupOrderDetailPage({
               ? `${groupOrder.bankName} · ${groupOrder.bankHolder} · ${groupOrder.bankAccount}`
               : undefined
           }
+        />
+        <OrderLinesCard
+          initialLines={groupOrder.lines}
+          status={groupOrder.status}
+          deliveryCostGs={groupOrder.deliveryCostGs}
+          splitStrategy={groupOrder.splitStrategy}
+          bankDetails={
+            groupOrder.bankName
+              ? `${groupOrder.bankName} · ${groupOrder.bankHolder} · ${groupOrder.bankAccount}`
+              : ""
+          }
+          slug={groupOrder.slug}
         />
       </section>
     </div>

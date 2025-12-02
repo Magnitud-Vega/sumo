@@ -155,7 +155,7 @@ export default function ItemForm({
             className="mt-1 w-full rounded-md border border-sumo-soft bg-sumo-surface px-3 py-2 text-sumo-sm"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Sin mayonesa, sin picante, etc."
+            placeholder="Sin pan, sin verduras, etc."
           />
         </label>
 
