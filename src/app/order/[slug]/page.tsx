@@ -284,7 +284,9 @@ export default async function OrderPage({ params }: OrderPageProps) {
                     <td className="font-medium">{line.name}</td>
                     <td>
                       {line.itemName}{" "}
-                      <span className="text-sumo-secondary">({line.note})</span>
+                      <span className="text-sumo-secondary">
+                        {line.note ? ` (${line.note})` : ""}
+                      </span>
                     </td>
                     <td className="text-right">{formatGs(line.subtotalGs)}</td>
                     <td className="text-right">{formatGs(deliveryToShow)}</td>
@@ -385,7 +387,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                       {line.name}
                     </p>
                     <p className="text-sumo-xs">
-                      {line.itemName} ({line.note})
+                      {line.itemName} {line.note ? ` (${line.note})` : ""}
                     </p>
                   </div>
                   <span
