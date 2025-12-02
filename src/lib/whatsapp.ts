@@ -7,7 +7,10 @@ const TOKEN = process.env.WHATSAPP_TOKEN;
 const SENDER_NAME = process.env.WHATSAPP_SENDER_NAME || "SUMO Pedidos";
 
 // Dominio de la app para armar el link a la orden
-const APP_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || "https://sumo-mu.vercel.app/order/cena-mchill"; // ej: https://sumo-eight.vercel.app
+const APP_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.BASE_URL ||
+  "https://sumo-mu.vercel.app/order/cena-mchill"; // ej: https://sumo-eight.vercel.app
 
 if (!PHONE_ID || !TOKEN) {
   console.warn(
@@ -37,14 +40,27 @@ export function toGs(n: number) {
  * - Sin "+"
  * - Para Paraguay: "0985..." → "595985..."
  */
-export function normalizePhoneToMeta(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  if (!digits) return "";
+export function normalizePhoneToMeta(phone: string | null | undefined) {
+  if (!phone) return "";
 
+  const digits = phone.replace(/\D/g, "");
+
+  // Si empieza con 0 → lo convertimos a 595 (Paraguay)
   if (digits.startsWith("0")) {
-    return `595${digits.slice(1)}`;
+    return "595" + digits.slice(1);
   }
 
+  // Si ya empieza en 595 → perfecto
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // Si empieza con +595
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // fallback para cualquier otro formato
   return digits;
 }
 

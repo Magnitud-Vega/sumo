@@ -62,13 +62,13 @@ export default function ItemForm({
     <div className="card-sumo space-y-4">
       <div className="card-sumo-header">
         <div>
-          <h2 className="card-sumo-title font-brand text-sumo-xl">
+          <h2 className="card-sumo-title font-brand text-sumo-xl text-sumo-primary">
             Sumá tu pedido
           </h2>
-          <p className="card-sumo-subtitle">
+          {/* <p className="card-sumo-subtitle">
             Elegí tu comida, completá tus datos y confirmá. El organizador se
             encarga del resto.
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -137,13 +137,13 @@ export default function ItemForm({
               id="whatsapp"
               name="whatsapp"
               className="mt-1 w-full rounded-md border border-sumo-soft bg-sumo-surface px-3 py-2 text-sumo-sm"
-              placeholder="5959XXXXXXX"
+              placeholder="09XXXXXXXX"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
             />
-            <p className="mt-1 text-sumo-xs text-sumo-muted">
+            {/* <p className="mt-1 text-sumo-xs text-sumo-muted">
               Usá solo números para que podamos contactarte si hay dudas.
-            </p>
+            </p> */}
           </label>
         </div>
 
@@ -161,7 +161,7 @@ export default function ItemForm({
 
         <div className="flex justify-end pt-2">
           <button
-            className="btn-sumo disabled:opacity-60 disabled:cursor-not-allowed"
+            className="btn-sumo-secondary disabled:opacity-60 disabled:cursor-not-allowed"
             type="button"
             onClick={handleSubmit}
             disabled={loading}

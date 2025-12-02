@@ -26,16 +26,27 @@ export function formatGs(n: number) {
  * - Para Paraguay, si empieza con "0" → reemplazar por "595".
  *   (ajustar según cómo guardes tus números)
  */
-export function normalizePhoneForGreen(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  if (!digits) return "";
+export function normalizePhoneForGreen(phone: string | null | undefined) {
+  if (!phone) return "";
 
-  // Ejemplo simple para Paraguay:
-  // "0985123456" → "595985123456"
+  const digits = phone.replace(/\D/g, "");
+
+  // Si empieza con 0 → lo convertimos a 595 (Paraguay)
   if (digits.startsWith("0")) {
-    return `595${digits.slice(1)}`;
+    return "595" + digits.slice(1);
   }
-  // Si ya viene con "595..." lo dejamos
+
+  // Si ya empieza en 595 → perfecto
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // Si empieza con +595
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // fallback para cualquier otro formato
   return digits;
 }
 

@@ -198,7 +198,7 @@ export default function OrderLinesCard({
 
         const statusPillClass =
           line.status === "PAID"
-            ? "table-sumo-status-paid"
+            ? "table-sumo-status-done"
             : "table-sumo-status-pending";
 
         const previewLine = previewById[line.id];

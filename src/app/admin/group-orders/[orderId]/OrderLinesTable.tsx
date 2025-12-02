@@ -148,7 +148,7 @@ export default function OrderLinesTable({
 
             const statusPillClass =
               line.status === "PAID"
-                ? "table-sumo-status-paid"
+                ? "table-sumo-status-done"
                 : "table-sumo-status-pending";
 
             const previewLine = previewById[line.id];

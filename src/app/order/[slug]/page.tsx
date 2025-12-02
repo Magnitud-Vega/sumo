@@ -5,6 +5,8 @@ import type { GroupOrder, Menu, OrderLine, MenuItem } from "@prisma/client";
 import BankInfoCard from "./BankInfoCard";
 import ItemForm from "./OrderItemForm";
 import { computeDeliveryPreview } from "@/lib/order-preview";
+import Image from "next/image";
+import NameLogo from "@/../public/name-logo.png";
 
 type Status = GroupOrder["status"];
 
@@ -64,7 +66,26 @@ function formatGs(value: number) {
 
 function normalizePhone(phone: string | null | undefined) {
   if (!phone) return "";
-  return phone.replace(/\D/g, ""); //.replace(/^0/, "595").replace("+", "");
+
+  const digits = phone.replace(/\D/g, "");
+
+  // Si empieza con 0 → lo convertimos a 595 (Paraguay)
+  if (digits.startsWith("0")) {
+    return "595" + digits.slice(1);
+  }
+
+  // Si ya empieza en 595 → perfecto
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // Si empieza con +595
+  if (digits.startsWith("595")) {
+    return digits;
+  }
+
+  // fallback para cualquier otro formato
+  return digits;
 }
 
 function buildWhatsAppTransferMessage(
@@ -75,8 +96,8 @@ function buildWhatsAppTransferMessage(
   const text = `Hola 👋, soy ${line.name}.
 Quiero avisar el pago por TRANSFERENCIA de mi pedido.
 
-Datos del pedido:
-- Pedido: ${order.slug}
+Datos de la orden:
+- Orden: ${order.slug}
 - Ítem: ${line.itemName}
 - Monto total: ${formatGs(line.totalGs)} Gs.
 - Método de pago: Transferencia bancaria.
@@ -125,31 +146,43 @@ export default async function OrderPage({ params }: OrderPageProps) {
       {/* HEADER */}
       <section className="card-sumo space-y-3">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <p className="text-sumo-xs text-sumo-muted">
-              Pedido de grupo · {order.slug.toUpperCase()}
-            </p>
-            <h1 className="card-sumo-title font-brand text-sumo-2xl">
+          <div className="flex items-center">
+            <Image src={NameLogo} alt="SUMO GO" width={80} height={80} />
+            {/* <p className="text-sumo-xs text-sumo-muted">
+              Orden de grupo · {order.slug.toUpperCase()}
+            </p> */}
+            <h1 className="card-sumo-title font-brand text-sumo-2xl text-sumo-primary">
               {order.menu.title}
             </h1>
           </div>
           <div className="flex flex-col items-start md:items-end gap-1">
-            <span className="text-sumo-xs text-sumo-muted">
-              Organizado por la empresa
+            <span
+              className={`inline-flex items-center table-sumo-status-pill ${
+                order.status === "OPEN"
+                  ? "table-sumo-status-done"
+                  : "table-sumo-status-pending"
+              } text-lg`}
+            >
+              Orden: {mapStatusLabel(order.status)}
             </span>
-            <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-sumo-muted text-sumo-primary">
-              Estado: {mapStatusLabel(order.status)}
+            <span className="text-sumo-xs text-sumo-muted">
+              Código del pedido: {order.slug.toUpperCase()}
             </span>
           </div>
         </div>
 
-        {order.status === "OPEN" && (
-          <p className="text-sumo-sm text-sumo-muted">
-            El pedido todavía está <strong>abierto</strong>. Podés sumar tu
-            pedido y elegir cómo vas a pagar. Una vez que se cierre, vas a ver
-            aquí las instrucciones para confirmar tu pago.
+        {/* TODO: ver que puede ir aquí */}
+        {/* {order.status === "OPEN" && (
+          <p className="text-sumo-sm text-sumo-secondary">
+            Sumá tu pedido y elegí el método de pago.
           </p>
         )}
+
+        {isClosedOrDelivered && (
+          <p className="text-sumo-sm text-sumo-secondary">
+            Hacé tu pago y avisá al restaurante de tu pago.
+          </p>
+        )} */}
       </section>
 
       {/* FORM PARA SUMAR ITEMS (solo cuando está abierto) */}
@@ -170,21 +203,31 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
       {/* DETALLE DE ITEMS */}
       <section className="card-sumo space-y-3">
-        <h2 className="card-sumo-title font-brand text-sumo-xl">
-          Detalle de pedidos
-        </h2>
+        <div className="card-sumo-header">
+          <h2 className="card-sumo-title font-brand text-sumo-xl text-sumo-primary">
+            Lista de pedidos
+          </h2>
 
-        {/* Podés mostrar también totales estimados si está OPEN */}
-        {order.status === "OPEN" && (
-          <p className="text-sumo-xs text-sumo-muted">
-            Los montos de delivery y total son <strong>estimados</strong> y
-            pueden cambiar hasta el cierre del pedido.
-            <br />
-            Subtotal actual: {formatGs(preview.sumSubtotal)} Gs · Delivery
-            estimado: {formatGs(preview.sumEstimatedDelivery)} Gs · Total
-            estimado: {formatGs(preview.sumEstimatedTotal)} Gs
-          </p>
-        )}
+          {/* Podés mostrar también totales estimados si está OPEN */}
+          {order.status === "OPEN" && (
+            <p className="text-sumo-sm text-sumo-secondary">
+              <span className="table-sumo-status-pill table-sumo-status-info">
+                Subtotal general: <b>{formatGs(preview.sumSubtotal)}</b> Gs
+              </span>
+              <span className="table-sumo-status-pill table-sumo-status-info">
+                Delivery por persona:{" "}
+                <b>{formatGs(preview.sumEstimatedDelivery)}</b> Gs
+              </span>
+              <span className="table-sumo-status-pill table-sumo-status-info">
+                Total general: <b>{formatGs(preview.sumEstimatedTotal)}</b> Gs
+              </span>
+              <br />
+              <span className="text-sumo-xs text-sumo-muted">
+                Mientras la orden este abierta los montos son estimativos.
+              </span>
+            </p>
+          )}
+        </div>
 
         {/* DESKTOP: table */}
         <div className="hidden md:block overflow-x-auto">
@@ -249,7 +292,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                       <span
                         className={`table-sumo-status-pill ${
                           line.status === "PAID"
-                            ? "table-sumo-status-paid"
+                            ? "table-sumo-status-done"
                             : "table-sumo-status-pending"
                         }`}
                       >
@@ -285,7 +328,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                           </div>
                         )}
 
-                        {(!isPending ||
+                        {/* {(!isPending ||
                           line.payMethod === "TC" ||
                           line.payMethod === "TD" ||
                           line.payMethod === "QR") &&
@@ -294,7 +337,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                             <p className="text-sumo-xs text-sumo-muted">
                               No hay acciones disponibles.
                             </p>
-                          )}
+                          )} */}
                       </td>
                     )}
                   </tr>
@@ -347,7 +390,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                   <span
                     className={`table-sumo-status-pill ${
                       line.status === "PAID"
-                        ? "table-sumo-status-paid"
+                        ? "table-sumo-status-done"
                         : "table-sumo-status-pending"
                     }`}
                   >
@@ -417,7 +460,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                       </div>
                     )}
 
-                    {(!isPending ||
+                    {/* {(!isPending ||
                       line.payMethod === "TC" ||
                       line.payMethod === "TD" ||
                       line.payMethod === "QR") &&
@@ -426,7 +469,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                         <p className="text-[11px] text-sumo-muted">
                           No hay acciones disponibles.
                         </p>
-                      )}
+                      )} */}
                   </div>
                 )}
               </div>
