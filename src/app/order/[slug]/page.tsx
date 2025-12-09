@@ -154,7 +154,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
           </div>
           <p className="text-sumo-md text-sumo-danger">
             {/* Orden de grupo · {order.slug.toUpperCase()} */}
-            🎁🍰 Hoy cenamos por el cumple de Jessy 🎉🎂🎈🥳
+            🎁🍰🥳 Cumple de Yami!! 🎉🎂🎈
           </p>
           <div className="flex flex-col items-start md:items-end gap-1">
             <span
