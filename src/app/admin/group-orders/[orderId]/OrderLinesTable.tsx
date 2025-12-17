@@ -115,6 +115,7 @@ export default function OrderLinesTable({
             <th>WhatsApp</th>
             <th>Pago</th>
             <th>Item</th>
+            <th>Cantidad</th>
             <th className="text-right">Subtotal (Gs)</th>
             <th className="text-right">
               Delivery {status === "OPEN" && " (estimado)"} (Gs)
@@ -188,6 +189,7 @@ export default function OrderLinesTable({
                     {line.note ? `(${line.note})` : ""}
                   </span>
                 </td>
+                <td>{line.qty}</td>
                 <td className="text-right">
                   {line.subtotalGs.toLocaleString("es-PY")}
                 </td>

@@ -229,6 +229,9 @@ export default function OrderLinesCard({
                 <p className="text-sumo-xs">
                   {line.itemName} {line.note ? ` (${line.note})` : ""}
                 </p>
+                <p className="text-sumo-xs font-bold text-sumo-primary">
+                  Cantidad: {line.qty}
+                </p>
               </div>
               <span className={`table-sumo-status-pill ${statusPillClass}`}>
                 {payMethodLabel}: {paymentLabel}

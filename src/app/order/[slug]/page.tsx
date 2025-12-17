@@ -153,8 +153,8 @@ export default async function OrderPage({ params }: OrderPageProps) {
             </h1>
           </div>
           <p className="text-sumo-md text-sumo-danger">
-            {/* Orden de grupo · {order.slug.toUpperCase()} */}
-            🎁🍰🥳 Cumple de Yami!! 🎉🎂🎈
+            Orden de grupo · {order.slug.toUpperCase()}
+            {/* 🎁🍰🥳 Cumple de Yami!! 🎉🎂🎈 */}
           </p>
           <div className="flex flex-col items-start md:items-end gap-1">
             <span
@@ -237,6 +237,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
               <tr>
                 <th>Nombre</th>
                 <th>Ítem del menú</th>
+                <th>Cantidad</th>
                 <th className="text-right">Subtotal (Gs)</th>
                 <th className="text-right">
                   Delivery {order.status === "OPEN" && " (estimado)"} (Gs)
@@ -288,6 +289,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                         {line.note ? ` (${line.note})` : ""}
                       </span>
                     </td>
+                    <td className="text-right">{line.qty}</td>
                     <td className="text-right">{formatGs(line.subtotalGs)}</td>
                     <td className="text-right">{formatGs(deliveryToShow)}</td>
                     <td className="text-right">{formatGs(totalToShow)}</td>
@@ -388,6 +390,9 @@ export default async function OrderPage({ params }: OrderPageProps) {
                     </p>
                     <p className="text-sumo-xs">
                       {line.itemName} {line.note ? ` (${line.note})` : ""}
+                    </p>
+                    <p className="text-sumo-xs font-bold text-sumo-primary">
+                      Cantidad: {line.qty}
                     </p>
                   </div>
                   <span
